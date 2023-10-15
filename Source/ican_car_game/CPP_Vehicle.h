@@ -47,6 +47,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Movement")
 	FRotator GetMeshWorldRotation();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Movement")
+	float GetInitialAccelerationSpeed();
+
 	// Setter functions
 	// Setter functions (Camera)
 	UFUNCTION(BlueprintCallable, Category = "Setters | Camera")
@@ -127,7 +130,7 @@ public:
 	float SteeringSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float SteeringRotationSpeed;
+	float SteeringRotationForce;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float MaxRotation;

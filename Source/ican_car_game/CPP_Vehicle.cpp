@@ -112,6 +112,11 @@ FRotator ACPP_Vehicle::GetMeshWorldRotation()
 	return Mesh->GetComponentRotation();
 }
 
+float ACPP_Vehicle::GetInitialAccelerationSpeed()
+{
+	return InitialAccelerationSpeed;
+}
+
 // Set Camera properties
 void ACPP_Vehicle::SetSpringArmLength(float Length)
 {
