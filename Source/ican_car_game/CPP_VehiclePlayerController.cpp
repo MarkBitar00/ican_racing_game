@@ -67,7 +67,7 @@ void ACPP_VehiclePlayerController::HandleAccelerate(const FInputActionValue& Inp
 
 void ACPP_VehiclePlayerController::HandleStartAccelerate()
 {
-	PlayerCharacter->SetSpringArmLength(PlayerCharacter->MaxCameraZoom);
+	PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->MaxCameraZoom);
 }
 
 void ACPP_VehiclePlayerController::HandleStopAccelerate(const FInputActionInstance& InputActionInstance)
@@ -75,7 +75,7 @@ void ACPP_VehiclePlayerController::HandleStopAccelerate(const FInputActionInstan
 	const float AccelerationDuration = InputActionInstance.GetTriggeredTime();
 	float DecelerationTimelinePlayRate = 1 / FMath::Clamp(AccelerationDuration, 0, PlayerCharacter->MaxDecelerationDuration);
 
-	PlayerCharacter->SetSpringArmLength(PlayerCharacter->CameraInitialZoom);
+	PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->CameraInitialZoom);
 
 	/* TODO Set Deceleration Timeline play rate and execute the code below on the Timeline's Update
 
@@ -90,8 +90,8 @@ void ACPP_VehiclePlayerController::HandleStopAccelerate(const FInputActionInstan
 void ACPP_VehiclePlayerController::HandleStartBrake()
 {
 	PlayerCharacter->AccelerationSpeed = 0;
-	PlayerCharacter->SetSpringArmLength(PlayerCharacter->CameraInitialZoom);
-	PlayerCharacter->SetSpringArmSocketOffsetPitch(0);
+	PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->CameraInitialZoom);
+	PlayerCharacter->SetCameraCurrentOffset(0);
 	/* TODO Stop Deceleration Timeline */
 }
 
@@ -108,7 +108,7 @@ void ACPP_VehiclePlayerController::HandleSteer(const FInputActionValue& InputAct
 	float SteeringRotationForce = PlayerCharacter->SteeringRotationForce;
 	UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(PlayerCharacter->GetRootComponent());
 
-	PlayerCharacter->SetSpringArmSocketOffsetPitch(SteerValue > 0 ? PlayerCharacter->MaxCameraOffset : -PlayerCharacter->MaxCameraOffset);
+	PlayerCharacter->SetCameraCurrentOffset(SteerValue > 0 ? PlayerCharacter->MaxCameraOffset : -PlayerCharacter->MaxCameraOffset);
 
 	Mesh->AddTorqueInDegrees(FVector(0, 0, SteerValue * SteeringSpeed), NAME_None, true);
 
@@ -117,7 +117,7 @@ void ACPP_VehiclePlayerController::HandleSteer(const FInputActionValue& InputAct
 
 void ACPP_VehiclePlayerController::HandleStopSteer()
 {
-	PlayerCharacter->SetSpringArmSocketOffsetPitch(0);
+	PlayerCharacter->SetCameraCurrentOffset(0);
 }
 
 // Toggle Polarity Input Action handler

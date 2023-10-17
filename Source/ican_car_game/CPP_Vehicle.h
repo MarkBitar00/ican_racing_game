@@ -43,6 +43,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Camera")
 	float GetSpringArmSocketOffsetPitch();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Camera")
+	float GetCameraCurrentZoom();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Camera")
+	float GetCameraCurrentOffset();
+
 	// Getter functions (Movement)
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Movement")
 	FRotator GetMeshWorldRotation();
@@ -57,6 +63,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Setters | Camera")
 	virtual void SetSpringArmSocketOffsetPitch(float Pitch);
+
+	UFUNCTION(BlueprintCallable, Category = "Setters | Camera")
+	virtual void SetCameraCurrentZoom(float Zoom);
+
+	UFUNCTION(BlueprintCallable, Category = "Setters | Camera")
+	virtual void SetCameraCurrentOffset(float Pitch);
 
 	// Setter functions (Movement)
 	UFUNCTION(BlueprintCallable, Category = "Setters | Movement")

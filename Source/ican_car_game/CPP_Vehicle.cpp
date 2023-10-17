@@ -106,6 +106,16 @@ float ACPP_Vehicle::GetSpringArmSocketOffsetPitch()
 	return SpringArm->SocketOffset.Y;
 }
 
+float ACPP_Vehicle::GetCameraCurrentZoom()
+{
+	return CameraCurrentZoom;
+}
+
+float ACPP_Vehicle::GetCameraCurrentOffset()
+{
+	return CameraCurrentOffset;
+}
+
 // Get Movement properties
 FRotator ACPP_Vehicle::GetMeshWorldRotation()
 {
@@ -126,6 +136,16 @@ void ACPP_Vehicle::SetSpringArmLength(float Length)
 void ACPP_Vehicle::SetSpringArmSocketOffsetPitch(float Pitch)
 {
 	SpringArm->SocketOffset.Y = Pitch;
+}
+
+void ACPP_Vehicle::SetCameraCurrentZoom(float Zoom)
+{
+	CameraCurrentZoom = Zoom;
+}
+
+void ACPP_Vehicle::SetCameraCurrentOffset(float Pitch)
+{
+	CameraCurrentOffset = Pitch;
 }
 
 // Set Movement properties
