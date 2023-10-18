@@ -7,13 +7,16 @@ void ACPP_VehiclePlayerController::OnPossess(APawn* aPawn)
 	// Store references to the player's Pawn and the Enhanced Input Component
 	PlayerCharacter = Cast<ACPP_Vehicle>(aPawn);
 	EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
+
 	checkf(PlayerCharacter, TEXT("ACPP_VehiclePlayerController derived classes should only possess ACPP_Vehicle derived Pawns"));
 	checkf(EnhancedInputComponent, TEXT("Unable to get reference to the Enhanced Input Component"));
 	
 	// Get the player's Subsystem, clear mappings and add required mapping
 	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+
 	checkf(InputSubsystem, TEXT("Unable to get reference to the Enhanced Input Local Player Subsystem"));
 	checkf(InputMappingContext, TEXT("Input Mapping Context not specified"));
+
 	InputSubsystem->ClearAllMappings();
 	InputSubsystem->AddMappingContext(InputMappingContext, 0);
 
@@ -109,10 +112,17 @@ void ACPP_VehiclePlayerController::HandleSteer(const FInputActionValue& InputAct
 	UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(PlayerCharacter->GetRootComponent());
 
 	PlayerCharacter->SetCameraCurrentOffset(SteerValue > 0 ? PlayerCharacter->MaxCameraOffset : -PlayerCharacter->MaxCameraOffset);
-
 	Mesh->AddTorqueInDegrees(FVector(0, 0, SteerValue * SteeringSpeed), NAME_None, true);
 
-	/* TODO Add Force at Location for Mesh rotation when steering */
+	FVector RightVector = Mesh->GetRightVector();
+	USceneComponent* SteerLeft = PlayerCharacter->GetSteerLeftComponent();
+	USceneComponent* SteerRight = PlayerCharacter->GetSteerRightComponent();
+	FVector SteerLeftLocation = SteerLeft->GetComponentLocation();
+	FVector SteerRightLocation = SteerRight->GetComponentLocation();
+	FVector Force = RightVector * SteeringRotationForce * (SteerValue > 0 ? 1 : -1);
+	FVector Location = SteerValue > 0 ? SteerRightLocation : SteerLeftLocation;
+
+	Mesh->AddForceAtLocation(Force, Location);
 }
 
 void ACPP_VehiclePlayerController::HandleStopSteer()

@@ -39,6 +39,14 @@ ACPP_Vehicle::ACPP_Vehicle()
 	SetupHoverComponent(HoverBackLeft, FVector(-45, -45, -50));
 	HoverBackRight = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverBackRight"));
 	SetupHoverComponent(HoverBackRight, FVector(-45, 45, -50));
+
+	// Create and setup Steer locations
+	SteerLeftLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SteerLeftLocation"));
+	SteerLeftLocation->SetRelativeLocation(FVector(0, -50, 0));
+	SteerLeftLocation->SetupAttachment(RootComponent);
+	SteerRightLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SteerRightLocation"));
+	SteerRightLocation->SetRelativeLocation(FVector(0, 50, 0));
+	SteerRightLocation->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned

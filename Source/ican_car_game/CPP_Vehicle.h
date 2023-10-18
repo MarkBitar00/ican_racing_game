@@ -36,6 +36,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Components")
 	FORCEINLINE class USpringArmComponent* GetSpringArm() const { return SpringArm; }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Components")
+	FORCEINLINE class USceneComponent* GetSteerLeftComponent() const { return SteerLeftLocation; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Components")
+	FORCEINLINE class USceneComponent* GetSteerRightComponent() const { return SteerRightLocation; }
+
 	// Getter functions (Camera)
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Camera")
 	float GetSpringArmLength();
@@ -109,63 +115,69 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
 	UCPP_HoverComponent* HoverBackRight;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
+	USceneComponent* SteerLeftLocation;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
+	USceneComponent* SteerRightLocation;
+
 	// Attributes (Camera)
 	UPROPERTY(BlueprintReadonly, Category = "Camera")
-	float CameraCurrentZoom;
+	float CameraCurrentZoom = 0;
 
 	UPROPERTY(BlueprintReadonly, Category = "Camera")
-	float CameraCurrentOffset;
+	float CameraCurrentOffset = 0;
 
 	// Attributes (Movement)
 	UPROPERTY(BlueprintReadonly, Category = "Movement")
-	float InitialAccelerationSpeed;
+	float InitialAccelerationSpeed = 15000;
 
 public:
 	// Public attributes (Camera)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
-	float CameraInitialZoom;
+	float CameraInitialZoom = 400;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
-	float MaxCameraZoom;
+	float MaxCameraZoom = 600;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
-	float MaxCameraOffset;
+	float MaxCameraOffset = 120;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
-	float CameraInterpolationSpeed;
+	float CameraInterpolationSpeed = 1;
 
 	// Public attributes (Movement)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float AccelerationSpeed;
+	float AccelerationSpeed = 15000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float SteeringSpeed;
+	float SteeringSpeed = 500;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float SteeringRotationForce;
+	float SteeringRotationForce = 80000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float MaxRotation;
+	float MaxRotation = 20;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float MaxDecelerationDuration;
+	float MaxDecelerationDuration = 3;
 
 	// Public attributes (Hover)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hover")
-	float HoverHeight;
+	float HoverHeight = 120;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hover")
-	float HoverForce;
+	float HoverForce = 180000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hover")
-	float LinearDamping;
+	float LinearDamping = 3;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hover")
-	float AngularDamping;
+	float AngularDamping = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hover")
-	float CenterOfMassHeight;
+	float CenterOfMassHeight = -100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hover")
-	float GravityForce;
+	float GravityForce = 3000;
 };
