@@ -53,17 +53,21 @@ ACPP_Vehicle::ACPP_Vehicle()
 
 	// Create Curves and set default
 	CurveAttraction = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveAttraction"));
-	static ConstructorHelpers::FObjectFinder<UCurveFloat>
-		CurveAttractionFile(TEXT("/Game/Utils/Curves/AttractionCurve"));
-	CurveAttraction = CurveAttractionFile.Object;
 	CurveRepulsion = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveRepulsion"));
-	static ConstructorHelpers::FObjectFinder<UCurveFloat>
-		CurveRepulsionFile(TEXT("/Game/Utils/Curves/RepulsionCurve"));
-	CurveRepulsion = CurveRepulsionFile.Object;
 	CurveBoost = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoost"));
+	CurveTimeline = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveTimeline"));
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>
-		CurveBoostFile(TEXT("/Game/Utils/Curves/BoostCurve"));
+		CurveAttractionFile(TEXT("/Game/Utils/Curves/AttractionCurve")),
+		CurveRepulsionFile(TEXT("/Game/Utils/Curves/RepulsionCurve")),
+		CurveBoostFile(TEXT("/Game/Utils/Curves/BoostCurve")),
+		CurveTimelineFile(TEXT("/Game/Utils/Curves/TimelineFloatDescCurve"));
+	CurveAttraction = CurveAttractionFile.Object;
+	CurveRepulsion = CurveRepulsionFile.Object;
 	CurveBoost = CurveBoostFile.Object;
+	CurveTimeline = CurveTimelineFile.Object;
+
+	TimelineDeceleration = CreateDefaultSubobject<UTimelineComponent>(TEXT("TimelineDeceleration"));
+	TimelineUpdate.BindUFunction(this, FName{ TEXT("TimelineDecelerationUpdate") });
 
 	// Add "Vehicle" tag
 	this->Tags.Add(FName("Vehicle"));
@@ -90,6 +94,9 @@ void ACPP_Vehicle::BeginPlay()
 	HoverFrontRight->Init(Mesh, HoverHeight, HoverForce, GravityForce);
 	HoverBackLeft->Init(Mesh, HoverHeight, HoverForce, GravityForce);
 	HoverBackRight->Init(Mesh, HoverHeight, HoverForce, GravityForce);
+
+	// Bind Timeline functions
+	TimelineDeceleration->AddInterpFloat(CurveTimeline, TimelineUpdate);
 }
 
 // Called every frame
@@ -121,6 +128,12 @@ void ACPP_Vehicle::SetupHoverComponent(UCPP_HoverComponent* HoverComponent, FVec
 {
 	HoverComponent->SetRelativeLocation(Location);
 	HoverComponent->SetupAttachment(RootComponent);
+}
+
+// Called during the Deceleration Timeline's update event
+void ACPP_Vehicle::TimelineDecelerationUpdate(float Alpha)
+{
+	Mesh->AddForce(Mesh->GetForwardVector() * AccelerationSpeed * Alpha, NAME_None, true);
 }
 
 // Get Camera properties

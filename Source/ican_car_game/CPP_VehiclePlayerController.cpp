@@ -77,25 +77,22 @@ void ACPP_VehiclePlayerController::HandleStopAccelerate(const FInputActionInstan
 {
 	const float AccelerationDuration = InputActionInstance.GetTriggeredTime();
 	float DecelerationTimelinePlayRate = 1 / FMath::Clamp(AccelerationDuration, 0, PlayerCharacter->MaxDecelerationDuration);
+	UTimelineComponent* DecelerationTimeline = PlayerCharacter->GetDecelerationTimeline();
 
 	PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->CameraInitialZoom);
-
-	/* TODO Set Deceleration Timeline play rate and execute the code below on the Timeline's Update
-
-	float AccelerationSpeed = PlayerCharacter->AccelerationSpeed;
-	UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(PlayerCharacter->GetRootComponent());
-	FVector ForwardVector = Mesh->GetForwardVector();
-
-	Mesh->AddForce(ForwardVector * AccelerationSpeed * TIMELINE_ALPHA, NAME_None, true); */
+	DecelerationTimeline->SetPlayRate(DecelerationTimelinePlayRate);
+	DecelerationTimeline->PlayFromStart();
 }
 
 // Brake Input Action handlers
 void ACPP_VehiclePlayerController::HandleStartBrake()
 {
+	UTimelineComponent* DecelerationTimeline = PlayerCharacter->GetDecelerationTimeline();
+
 	PlayerCharacter->AccelerationSpeed = 0;
 	PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->CameraInitialZoom);
 	PlayerCharacter->SetCameraCurrentOffset(0);
-	/* TODO Stop Deceleration Timeline */
+	DecelerationTimeline->Stop();
 }
 
 void ACPP_VehiclePlayerController::HandleStopBrake()
@@ -138,4 +135,6 @@ void ACPP_VehiclePlayerController::HandleTogglePolarity()
 
 	PlayerCharacter->SetMagneticPolarity(Polarity == EMagneticPolarity::POSITIVE ? EMagneticPolarity::NEGATIVE : EMagneticPolarity::POSITIVE);
 	Mesh->SetMaterial(0, Polarity == EMagneticPolarity::POSITIVE ? PlayerCharacter->GetMaterialNegative() : PlayerCharacter->GetMaterialPositive());
+
+	/* TODO if Magnet In Range, trigger boost */
 }

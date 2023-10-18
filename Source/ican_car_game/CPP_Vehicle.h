@@ -4,6 +4,7 @@
 #include "GameFramework/Pawn.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/TimelineComponent.h"
 #include "CPP_HoverComponent.h"
 #include "CPP_E_MagneticPolarity.h"
 #include "CPP_Vehicle.generated.h"
@@ -46,6 +47,12 @@ public:
 	// Getter functions (Materials)
 	FORCEINLINE class UMaterialInstance* GetMaterialPositive() const { return MaterialPositive; }
 	FORCEINLINE class UMaterialInstance* GetMaterialNegative() const { return MaterialNegative; }
+
+	// Getter functions (Timelines)
+	FORCEINLINE class UTimelineComponent* GetDecelerationTimeline() const { return TimelineDeceleration; }
+
+	UFUNCTION()
+	void TimelineDecelerationUpdate(float Alpha);
 
 	// Getter functions (Camera)
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Camera")
@@ -158,6 +165,15 @@ protected:
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	UCurveFloat* CurveBoost = nullptr;
 
+	// Timeline
+	UPROPERTY()
+	UTimelineComponent* TimelineDeceleration;
+
+	UPROPERTY()
+	UCurveFloat* CurveTimeline = nullptr;
+
+	FOnTimelineFloat TimelineUpdate{};
+
 public:
 	// Public attributes (Camera)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
@@ -209,6 +225,6 @@ public:
 
 private:
 	// Materials
-	UMaterialInstance* MaterialPositive;
-	UMaterialInstance* MaterialNegative;
+	UMaterialInstance* MaterialPositive = nullptr;
+	UMaterialInstance* MaterialNegative = nullptr;
 };
