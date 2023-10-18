@@ -133,4 +133,9 @@ void ACPP_VehiclePlayerController::HandleStopSteer()
 // Toggle Polarity Input Action handler
 void ACPP_VehiclePlayerController::HandleTogglePolarity()
 {
+	UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(PlayerCharacter->GetRootComponent());
+	EMagneticPolarity Polarity = PlayerCharacter->GetMagneticPolarity();
+
+	PlayerCharacter->SetMagneticPolarity(Polarity == EMagneticPolarity::POSITIVE ? EMagneticPolarity::NEGATIVE : EMagneticPolarity::POSITIVE);
+	Mesh->SetMaterial(0, Polarity == EMagneticPolarity::POSITIVE ? PlayerCharacter->GetMaterialNegative() : PlayerCharacter->GetMaterialPositive());
 }

@@ -64,18 +64,18 @@ protected:
 
 	// Attributes (Components)
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
-	UStaticMeshComponent* HoverParent;
+	UStaticMeshComponent* HoverParent = nullptr;
 
 	// Attributes (Hover)
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Hover")
-	float HoverHeight;
+	float HoverHeight = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Hover")
-	float HoverForce;
+	float HoverForce = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Hover")
-	float GravityForce;
+	float GravityForce = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Hover")
-	UCurveFloat* CurveHover;
+	UCurveFloat* CurveHover = nullptr;
 };

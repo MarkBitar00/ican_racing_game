@@ -7,7 +7,7 @@ ACPP_Vehicle::ACPP_Vehicle()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
-	// Create Mesh and set Root Component with default Scale and Material
+	// Create Mesh, Materials for Magnetic Polarity and set Root Component with default Scale and Material
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(Mesh);
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>
@@ -15,8 +15,11 @@ ACPP_Vehicle::ACPP_Vehicle()
 	Mesh->SetStaticMesh(MeshFile.Object);
 	Mesh->SetRelativeScale3D(FVector(2.4, 1.6, 0.8));
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance>
-		MaterialFile(TEXT("/Game/Materials/MaterialInstances/M_Positive"));
-	Mesh->SetMaterial(0, MaterialFile.Object);
+		MaterialPositiveFile(TEXT("/Game/Materials/MaterialInstances/M_Positive")),
+		MaterialNegativeFile(TEXT("/Game/Materials/MaterialInstances/M_Negative"));
+	MaterialPositive = MaterialPositiveFile.Object;
+	MaterialNegative = MaterialNegativeFile.Object;
+	Mesh->SetMaterial(0, MaterialPositiveFile.Object);
 
 	// Create Spring Arm and attach it to Root Component
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
@@ -47,6 +50,23 @@ ACPP_Vehicle::ACPP_Vehicle()
 	SteerRightLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SteerRightLocation"));
 	SteerRightLocation->SetRelativeLocation(FVector(0, 50, 0));
 	SteerRightLocation->SetupAttachment(RootComponent);
+
+	// Create Curves and set default
+	CurveAttraction = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveAttraction"));
+	static ConstructorHelpers::FObjectFinder<UCurveFloat>
+		CurveAttractionFile(TEXT("/Game/Utils/Curves/AttractionCurve"));
+	CurveAttraction = CurveAttractionFile.Object;
+	CurveRepulsion = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveRepulsion"));
+	static ConstructorHelpers::FObjectFinder<UCurveFloat>
+		CurveRepulsionFile(TEXT("/Game/Utils/Curves/RepulsionCurve"));
+	CurveRepulsion = CurveRepulsionFile.Object;
+	CurveBoost = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoost"));
+	static ConstructorHelpers::FObjectFinder<UCurveFloat>
+		CurveBoostFile(TEXT("/Game/Utils/Curves/BoostCurve"));
+	CurveBoost = CurveBoostFile.Object;
+
+	// Add "Vehicle" tag
+	this->Tags.Add(FName("Vehicle"));
 }
 
 // Called when the game starts or when spawned
@@ -135,6 +155,12 @@ float ACPP_Vehicle::GetInitialAccelerationSpeed()
 	return InitialAccelerationSpeed;
 }
 
+// Get Magnetism properties
+EMagneticPolarity ACPP_Vehicle::GetMagneticPolarity()
+{
+	return MagneticPolarity;
+}
+
 // Set Camera properties
 void ACPP_Vehicle::SetSpringArmLength(float Length)
 {
@@ -175,4 +201,10 @@ void ACPP_Vehicle::SetMeshWorldRotation(FRotator Rotation)
 void ACPP_Vehicle::SetMeshCenterOfMassHeight(float Height)
 {
 	Mesh->SetCenterOfMass(FVector(0, 0, Height));
+}
+
+// Set Movement properties
+void ACPP_Vehicle::SetMagneticPolarity(EMagneticPolarity Polarity)
+{
+	MagneticPolarity = Polarity;
 }

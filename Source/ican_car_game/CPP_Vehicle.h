@@ -5,6 +5,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "CPP_HoverComponent.h"
+#include "CPP_E_MagneticPolarity.h"
 #include "CPP_Vehicle.generated.h"
 
 UCLASS()
@@ -42,6 +43,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Components")
 	FORCEINLINE class USceneComponent* GetSteerRightComponent() const { return SteerRightLocation; }
 
+	// Getter functions (Materials)
+	FORCEINLINE class UMaterialInstance* GetMaterialPositive() const { return MaterialPositive; }
+	FORCEINLINE class UMaterialInstance* GetMaterialNegative() const { return MaterialNegative; }
+
 	// Getter functions (Camera)
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Camera")
 	float GetSpringArmLength();
@@ -61,6 +66,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Movement")
 	float GetInitialAccelerationSpeed();
+
+	// Getter functions (Magnetism)
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
+	EMagneticPolarity GetMagneticPolarity();
 
 	// Setter functions
 	// Setter functions (Camera)
@@ -88,6 +97,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Setters | Movement")
 	virtual void SetMeshWorldRotation(FRotator Rotation);
+
+	// Setter functions (Magnetism)
+	UFUNCTION(BlueprintCallable, Category = "Setters | Magnetism")
+	virtual void SetMagneticPolarity(EMagneticPolarity Polarity);
 
 protected:
 	// Called when the game starts or when spawned
@@ -131,6 +144,19 @@ protected:
 	// Attributes (Movement)
 	UPROPERTY(BlueprintReadonly, Category = "Movement")
 	float InitialAccelerationSpeed = 15000;
+
+	// Attributes (Magnetism)
+	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
+	EMagneticPolarity MagneticPolarity = EMagneticPolarity::POSITIVE;
+
+	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
+	UCurveFloat* CurveAttraction = nullptr;
+
+	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
+	UCurveFloat* CurveRepulsion = nullptr;
+
+	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
+	UCurveFloat* CurveBoost = nullptr;
 
 public:
 	// Public attributes (Camera)
@@ -180,4 +206,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hover")
 	float GravityForce = 3000;
+
+private:
+	// Materials
+	UMaterialInstance* MaterialPositive;
+	UMaterialInstance* MaterialNegative;
 };
