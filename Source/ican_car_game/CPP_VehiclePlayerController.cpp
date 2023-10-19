@@ -132,9 +132,31 @@ void ACPP_VehiclePlayerController::HandleTogglePolarity()
 {
 	UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(PlayerCharacter->GetRootComponent());
 	EMagneticPolarity Polarity = PlayerCharacter->GetMagneticPolarity();
+	UCurveFloat* CurveBoost = PlayerCharacter->GetCurveBoost();
+	ACPP_Magnet* Magnet = PlayerCharacter->GetMagnetInRange();
 
 	PlayerCharacter->SetMagneticPolarity(Polarity == EMagneticPolarity::POSITIVE ? EMagneticPolarity::NEGATIVE : EMagneticPolarity::POSITIVE);
 	Mesh->SetMaterial(0, Polarity == EMagneticPolarity::POSITIVE ? PlayerCharacter->GetMaterialNegative() : PlayerCharacter->GetMaterialPositive());
 
-	/* TODO if Magnet In Range, trigger boost */
+	if (Magnet == nullptr) return;
+	if (Magnet->GetMagneticPolarity() == Polarity)
+	{
+		float CurveFloatValue = CurveBoost->GetFloatValue(PlayerCharacter->GetCurveBoostDuration());
+
+		PlayerCharacter->AccelerationSpeed *= CurveFloatValue;
+		PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->GetCameraCurrentZoom() * CurveFloatValue);
+
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ACPP_VehiclePlayerController::OnTimerEnd, 1, false, CurveFloatValue);
+	}
+	else
+	{
+		PlayerCharacter->AccelerationSpeed = PlayerCharacter->GetInitialAccelerationSpeed();
+	}
+}
+
+// Reset Acceleration Speed and Spring Arm Length when boost ends
+void ACPP_VehiclePlayerController::OnTimerEnd()
+{
+	PlayerCharacter->AccelerationSpeed = PlayerCharacter->GetInitialAccelerationSpeed();
+	PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->MaxCameraZoom);
 }

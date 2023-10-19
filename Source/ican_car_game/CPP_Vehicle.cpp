@@ -1,4 +1,5 @@
 #include "CPP_Vehicle.h"
+#include "CPP_Magnet.h"
 
 // Sets default values
 ACPP_Vehicle::ACPP_Vehicle()
@@ -136,6 +137,18 @@ void ACPP_Vehicle::TimelineDecelerationUpdate(float Alpha)
 	Mesh->AddForce(Mesh->GetForwardVector() * AccelerationSpeed * Alpha, NAME_None, true);
 }
 
+float ACPP_Vehicle::GetCurveBoostDuration()
+{
+	if (MagnetInRange == nullptr) return 0;
+
+	FVector Location = GetActorLocation();
+	FVector MagnetLocation = MagnetInRange->GetActorLocation();
+	FVector VectorProjectionPlaneNormal = FVector(0, 0, 1);
+	float LocationsDistance = FVector::Dist(FVector::VectorPlaneProject(Location, VectorProjectionPlaneNormal), FVector::VectorPlaneProject(MagnetLocation, VectorProjectionPlaneNormal));
+
+	return LocationsDistance / MagnetInRange->ColliderRadius;
+}
+
 // Get Camera properties
 float ACPP_Vehicle::GetSpringArmLength()
 {
@@ -216,8 +229,13 @@ void ACPP_Vehicle::SetMeshCenterOfMassHeight(float Height)
 	Mesh->SetCenterOfMass(FVector(0, 0, Height));
 }
 
-// Set Movement properties
+// Set Magnetism properties
 void ACPP_Vehicle::SetMagneticPolarity(EMagneticPolarity Polarity)
 {
 	MagneticPolarity = Polarity;
+}
+
+void ACPP_Vehicle::SetMagnetInRange(ACPP_Magnet* Magnet)
+{
+	MagnetInRange = Magnet;
 }

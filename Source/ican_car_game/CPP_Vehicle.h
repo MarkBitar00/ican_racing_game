@@ -9,6 +9,8 @@
 #include "CPP_E_MagneticPolarity.h"
 #include "CPP_Vehicle.generated.h"
 
+class ACPP_Magnet;
+
 UCLASS()
 class ICAN_CAR_GAME_API ACPP_Vehicle : public APawn
 {
@@ -26,6 +28,8 @@ public:
 
 	// Functions
 	void SetupHoverComponent(UCPP_HoverComponent* HoverComponent, FVector Location);
+	void TimelineDecelerationUpdate(float Alpha);
+	float GetCurveBoostDuration();
 
 	// Getter functions
 	// Getter functions (Components)
@@ -51,9 +55,6 @@ public:
 	// Getter functions (Timelines)
 	FORCEINLINE class UTimelineComponent* GetDecelerationTimeline() const { return TimelineDeceleration; }
 
-	UFUNCTION()
-	void TimelineDecelerationUpdate(float Alpha);
-
 	// Getter functions (Camera)
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Camera")
 	float GetSpringArmLength();
@@ -77,6 +78,18 @@ public:
 	// Getter functions (Magnetism)
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
 	EMagneticPolarity GetMagneticPolarity();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
+	FORCEINLINE class UCurveFloat* GetCurveAttraction() const { return CurveAttraction; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
+	FORCEINLINE class UCurveFloat* GetCurveRepulsion() const { return CurveRepulsion; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
+	FORCEINLINE class UCurveFloat* GetCurveBoost() const { return CurveBoost; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
+	FORCEINLINE class ACPP_Magnet* GetMagnetInRange() const { return MagnetInRange; }
 
 	// Setter functions
 	// Setter functions (Camera)
@@ -108,6 +121,9 @@ public:
 	// Setter functions (Magnetism)
 	UFUNCTION(BlueprintCallable, Category = "Setters | Magnetism")
 	virtual void SetMagneticPolarity(EMagneticPolarity Polarity);
+
+	UFUNCTION(BlueprintCallable, Category = "Setters | Magnetism")
+	virtual void SetMagnetInRange(ACPP_Magnet* Magnet);
 
 protected:
 	// Called when the game starts or when spawned
@@ -165,9 +181,12 @@ protected:
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	UCurveFloat* CurveBoost = nullptr;
 
-	// Timeline
+	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
+	ACPP_Magnet* MagnetInRange = nullptr;
+
+	// Timeline Components
 	UPROPERTY()
-	UTimelineComponent* TimelineDeceleration;
+	UTimelineComponent* TimelineDeceleration = nullptr;
 
 	UPROPERTY()
 	UCurveFloat* CurveTimeline = nullptr;

@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "CPP_Vehicle.h"
+#include "CPP_Magnet.h"
 #include "CPP_VehiclePlayerController.generated.h"
 
 UCLASS(ABSTRACT)
@@ -60,4 +61,8 @@ private:
 	// Controlled Pawn
 	UPROPERTY()
 	ACPP_Vehicle* PlayerCharacter = nullptr;
+
+	// Timer
+	FTimerHandle TimerHandle;
+	void OnTimerEnd();
 };
