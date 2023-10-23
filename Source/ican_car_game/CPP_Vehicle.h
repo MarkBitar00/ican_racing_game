@@ -57,21 +57,9 @@ public:
 
 	// Getter functions (Camera)
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Camera")
-	float GetSpringArmLength();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Camera")
-	float GetSpringArmSocketOffsetPitch();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Camera")
 	float GetCameraCurrentZoom();
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Camera")
-	float GetCameraCurrentOffset();
-
 	// Getter functions (Movement)
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Movement")
-	FRotator GetMeshWorldRotation();
-
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Movement")
 	float GetInitialAccelerationSpeed();
 
@@ -94,29 +82,10 @@ public:
 	// Setter functions
 	// Setter functions (Camera)
 	UFUNCTION(BlueprintCallable, Category = "Setters | Camera")
-	virtual void SetSpringArmLength(float Length);
-
-	UFUNCTION(BlueprintCallable, Category = "Setters | Camera")
-	virtual void SetSpringArmSocketOffsetPitch(float Pitch);
-
-	UFUNCTION(BlueprintCallable, Category = "Setters | Camera")
 	virtual void SetCameraCurrentZoom(float Zoom);
 
 	UFUNCTION(BlueprintCallable, Category = "Setters | Camera")
 	virtual void SetCameraCurrentOffset(float Pitch);
-
-	// Setter functions (Movement)
-	UFUNCTION(BlueprintCallable, Category = "Setters | Movement")
-	virtual void SetMeshLinearDamping(float Damping);
-
-	UFUNCTION(BlueprintCallable, Category = "Setters | Movement")
-	virtual void SetMeshAngularDamping(float Damping);
-
-	UFUNCTION(BlueprintCallable, Category = "Setters | Movement")
-	virtual void SetMeshCenterOfMassHeight(float Height);
-
-	UFUNCTION(BlueprintCallable, Category = "Setters | Movement")
-	virtual void SetMeshWorldRotation(FRotator Rotation);
 
 	// Setter functions (Magnetism)
 	UFUNCTION(BlueprintCallable, Category = "Setters | Magnetism")
@@ -195,51 +164,51 @@ protected:
 
 public:
 	// Public attributes (Camera)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
 	float CameraInitialZoom = 400;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
 	float MaxCameraZoom = 600;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
 	float MaxCameraOffset = 120;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
 	float CameraInterpolationSpeed = 1;
 
 	// Public attributes (Movement)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
 	float AccelerationSpeed = 15000;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
 	float SteeringSpeed = 500;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
 	float SteeringRotationForce = 80000;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
 	float MaxRotation = 20;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
 	float MaxDecelerationDuration = 3;
 
 	// Public attributes (Hover)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hover")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
 	float HoverHeight = 120;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hover")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
 	float HoverForce = 180000;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hover")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
 	float LinearDamping = 3;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hover")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
 	float AngularDamping = 5;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hover")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
 	float CenterOfMassHeight = -100;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hover")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
 	float GravityForce = 3000;
 
 private:

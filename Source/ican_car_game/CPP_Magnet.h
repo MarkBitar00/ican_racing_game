@@ -44,22 +44,22 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
 	UStaticMeshComponent* Mesh;
 
-	// Attributes (Magnetism)
-	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
-	TArray<ACPP_Vehicle*> VehiclesInRange;
-
 public:
 	// Public attributes
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magnetism")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
 	float MagnetPower = 100;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magnetism")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
 	float ColliderRadius = 2000;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magnetism")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
 	EMagneticPolarity MagneticPolarity = EMagneticPolarity::POSITIVE;
 
 private:
+	// Attributes (Magnetism)
+	UPROPERTY()
+	TArray<ACPP_Vehicle*> VehiclesInRange;
+
 	// Materials
 	UMaterialInstance* MaterialPositive = nullptr;
 	UMaterialInstance* MaterialNegative = nullptr;

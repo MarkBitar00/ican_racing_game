@@ -67,6 +67,7 @@ ACPP_Vehicle::ACPP_Vehicle()
 	CurveBoost = CurveBoostFile.Object;
 	CurveTimeline = CurveTimelineFile.Object;
 
+	// Create Timeline and bind function to it
 	TimelineDeceleration = CreateDefaultSubobject<UTimelineComponent>(TEXT("TimelineDeceleration"));
 	TimelineUpdate.BindUFunction(this, FName{ TEXT("TimelineDecelerationUpdate") });
 
@@ -86,9 +87,9 @@ void ACPP_Vehicle::BeginPlay()
 
 	// Setup Mesh properties
 	Mesh->SetSimulatePhysics(true);
-	SetMeshLinearDamping(LinearDamping);
-	SetMeshAngularDamping(AngularDamping);
-	SetMeshCenterOfMassHeight(CenterOfMassHeight);
+	Mesh->SetLinearDamping(LinearDamping);
+	Mesh->SetAngularDamping(AngularDamping);
+	Mesh->SetCenterOfMass(FVector(0, 0, CenterOfMassHeight));
 
 	// Initialize Hover Components
 	HoverFrontLeft->Init(Mesh, HoverHeight, HoverForce, GravityForce);
@@ -105,17 +106,15 @@ void ACPP_Vehicle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Smooth out Spring Arm length movements
-	SetSpringArmLength(FMath::FInterpTo(GetSpringArmLength(), CameraCurrentZoom, DeltaTime, CameraInterpolationSpeed));
-
-	// Smooth out Spring Arm offset movements
-	SetSpringArmSocketOffsetPitch(FMath::FInterpTo(GetSpringArmSocketOffsetPitch(), CameraCurrentOffset, DeltaTime, CameraInterpolationSpeed));
+	// Smooth out Spring Arm length and offset movements
+	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, CameraCurrentZoom, DeltaTime, CameraInterpolationSpeed);
+	SpringArm->SocketOffset.Y = FMath::FInterpTo(SpringArm->SocketOffset.Y, CameraCurrentOffset, DeltaTime, CameraInterpolationSpeed);
 
 	// Clamp Mesh rotation
-	FRotator CurrentRotation = GetMeshWorldRotation();
+	FRotator CurrentRotation = Mesh->GetComponentRotation();
 	CurrentRotation.Roll = FMath::Clamp(CurrentRotation.Roll, -MaxRotation, MaxRotation);
 	CurrentRotation.Pitch = FMath::Clamp(CurrentRotation.Pitch, -MaxRotation, MaxRotation);
-	SetMeshWorldRotation(CurrentRotation);
+	Mesh->SetWorldRotation(CurrentRotation);
 }
 
 // Called to bind functionality to input
@@ -150,30 +149,9 @@ float ACPP_Vehicle::GetCurveBoostDuration()
 }
 
 // Get Camera properties
-float ACPP_Vehicle::GetSpringArmLength()
-{
-	return SpringArm->TargetArmLength;
-}
-
-float ACPP_Vehicle::GetSpringArmSocketOffsetPitch()
-{
-	return SpringArm->SocketOffset.Y;
-}
-
 float ACPP_Vehicle::GetCameraCurrentZoom()
 {
 	return CameraCurrentZoom;
-}
-
-float ACPP_Vehicle::GetCameraCurrentOffset()
-{
-	return CameraCurrentOffset;
-}
-
-// Get Movement properties
-FRotator ACPP_Vehicle::GetMeshWorldRotation()
-{
-	return Mesh->GetComponentRotation();
 }
 
 float ACPP_Vehicle::GetInitialAccelerationSpeed()
@@ -188,16 +166,6 @@ EMagneticPolarity ACPP_Vehicle::GetMagneticPolarity()
 }
 
 // Set Camera properties
-void ACPP_Vehicle::SetSpringArmLength(float Length)
-{
-	SpringArm->TargetArmLength = Length;
-}
-
-void ACPP_Vehicle::SetSpringArmSocketOffsetPitch(float Pitch)
-{
-	SpringArm->SocketOffset.Y = Pitch;
-}
-
 void ACPP_Vehicle::SetCameraCurrentZoom(float Zoom)
 {
 	CameraCurrentZoom = Zoom;
@@ -206,27 +174,6 @@ void ACPP_Vehicle::SetCameraCurrentZoom(float Zoom)
 void ACPP_Vehicle::SetCameraCurrentOffset(float Pitch)
 {
 	CameraCurrentOffset = Pitch;
-}
-
-// Set Movement properties
-void ACPP_Vehicle::SetMeshLinearDamping(float Damping)
-{
-	Mesh->SetLinearDamping(Damping);
-}
-
-void ACPP_Vehicle::SetMeshAngularDamping(float Damping)
-{
-	Mesh->SetAngularDamping(Damping);
-}
-
-void ACPP_Vehicle::SetMeshWorldRotation(FRotator Rotation)
-{
-	Mesh->SetWorldRotation(Rotation);
-}
-
-void ACPP_Vehicle::SetMeshCenterOfMassHeight(float Height)
-{
-	Mesh->SetCenterOfMass(FVector(0, 0, Height));
 }
 
 // Set Magnetism properties

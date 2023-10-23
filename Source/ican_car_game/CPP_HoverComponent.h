@@ -25,57 +25,25 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Hover();
 
-	// Getter functions
-	// Getter functions (Components)
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Components")
-	FORCEINLINE class UStaticMeshComponent* GetParent() const { return HoverParent; }
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Components")
-	FORCEINLINE class UCurveFloat* GetCurveHover() const { return CurveHover; }
-
-	// Getter functions (Hover)
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Hover")
-	float GetHoverHeight();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Hover")
-	float GetHoverForce();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Hover")
-	float GetGravityForce();
-
-	// Setter functions
-	// Setter functions (Components)
-	UFUNCTION(BlueprintCallable, Category = "Setters | Components")
-	virtual void SetParent(UStaticMeshComponent* Parent);
-
-	// Setter functions (Hover)
-	UFUNCTION(BlueprintCallable, Category = "Setters | Hover")
-	virtual void SetHoverHeight(float Height);
-
-	UFUNCTION(BlueprintCallable, Category = "Setters | Hover")
-	virtual void SetHoverForce(float Force);
-
-	UFUNCTION(BlueprintCallable, Category = "Setters | Hover")
-	virtual void SetGravityForce(float Force);
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+private:
 	// Attributes (Components)
-	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
+	UPROPERTY()
 	UStaticMeshComponent* HoverParent = nullptr;
 
 	// Attributes (Hover)
-	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Hover")
+	UPROPERTY()
 	float HoverHeight = 0;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Hover")
+	UPROPERTY()
 	float HoverForce = 0;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Hover")
+	UPROPERTY()
 	float GravityForce = 0;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Hover")
+	UPROPERTY()
 	UCurveFloat* CurveHover = nullptr;
 };

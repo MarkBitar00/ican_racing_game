@@ -131,15 +131,17 @@ void ACPP_VehiclePlayerController::HandleStopSteer()
 void ACPP_VehiclePlayerController::HandleTogglePolarity()
 {
 	UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(PlayerCharacter->GetRootComponent());
-	EMagneticPolarity Polarity = PlayerCharacter->GetMagneticPolarity();
+	EMagneticPolarity CurrentPolarity = PlayerCharacter->GetMagneticPolarity();
 	UCurveFloat* CurveBoost = PlayerCharacter->GetCurveBoost();
 	ACPP_Magnet* Magnet = PlayerCharacter->GetMagnetInRange();
 
-	PlayerCharacter->SetMagneticPolarity(Polarity == EMagneticPolarity::POSITIVE ? EMagneticPolarity::NEGATIVE : EMagneticPolarity::POSITIVE);
-	Mesh->SetMaterial(0, Polarity == EMagneticPolarity::POSITIVE ? PlayerCharacter->GetMaterialNegative() : PlayerCharacter->GetMaterialPositive());
+	EMagneticPolarity NewPolarity = CurrentPolarity == EMagneticPolarity::POSITIVE ? EMagneticPolarity::NEGATIVE : EMagneticPolarity::POSITIVE;
+
+	PlayerCharacter->SetMagneticPolarity(NewPolarity);
+	Mesh->SetMaterial(0, NewPolarity == EMagneticPolarity::POSITIVE ? PlayerCharacter->GetMaterialPositive() : PlayerCharacter->GetMaterialNegative());
 
 	if (Magnet == nullptr) return;
-	if (Magnet->GetMagneticPolarity() == Polarity)
+	if (Magnet->GetMagneticPolarity() == NewPolarity)
 	{
 		float CurveFloatValue = CurveBoost->GetFloatValue(PlayerCharacter->GetCurveBoostDuration());
 
