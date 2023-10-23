@@ -19,6 +19,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Construction script
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 	// Collision Sphere overlap functions
 	UFUNCTION()
 	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -48,7 +51,7 @@ protected:
 public:
 	// Public attributes
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magnetism")
-	float MagnetPower = 10000;
+	float MagnetPower = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Magnetism")
 	float ColliderRadius = 2000;

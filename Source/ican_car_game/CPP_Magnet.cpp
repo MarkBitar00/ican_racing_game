@@ -24,8 +24,15 @@ ACPP_Magnet::ACPP_Magnet()
 	MaterialNegative = MaterialNegativeFile.Object;
 	Mesh->SetRelativeScale3D(FVector(3, 3, 10));
 	Mesh->SetRelativeLocation(FVector(0, 0, 500));
-	Mesh->SetMaterial(0, MagneticPolarity == EMagneticPolarity::POSITIVE ? MaterialNegative : MaterialPositive);
 	Mesh->SetupAttachment(RootComponent);
+}
+
+void ACPP_Magnet::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	// Set Magnet Material according to its Magnetic Polarity
+	Mesh->SetMaterial(0, MagneticPolarity == EMagneticPolarity::POSITIVE ? MaterialPositive : MaterialNegative);
 }
 
 // Called when the game starts or when spawned
