@@ -36,13 +36,13 @@ ACPP_Vehicle::ACPP_Vehicle()
 
 	// Create and setup Hover Components
 	HoverFrontLeft = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverFrontLeft"));
-	SetupHoverComponent(HoverFrontLeft, FVector(45, -45, -50));
+	SetupHoverComponent(HoverFrontLeft, FVector(50, -50, 0));
 	HoverFrontRight = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverFrontRight"));
-	SetupHoverComponent(HoverFrontRight, FVector(45, 45, -50));
+	SetupHoverComponent(HoverFrontRight, FVector(50, 50, 0));
 	HoverBackLeft = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverBackLeft"));
-	SetupHoverComponent(HoverBackLeft, FVector(-45, -45, -50));
+	SetupHoverComponent(HoverBackLeft, FVector(-50, -50, 0));
 	HoverBackRight = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverBackRight"));
-	SetupHoverComponent(HoverBackRight, FVector(-45, 45, -50));
+	SetupHoverComponent(HoverBackRight, FVector(-50, 50, 0));
 
 	// Create and setup Steer locations
 	SteerLeftLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SteerLeftLocation"));
@@ -89,7 +89,7 @@ void ACPP_Vehicle::BeginPlay()
 	Mesh->SetSimulatePhysics(true);
 	Mesh->SetLinearDamping(LinearDamping);
 	Mesh->SetAngularDamping(AngularDamping);
-	Mesh->SetCenterOfMass(FVector(0, 0, CenterOfMassHeight));
+	//Mesh->SetCenterOfMass(FVector(0, 0, CenterOfMassHeight));
 
 	// Initialize Hover Components
 	HoverFrontLeft->Init(Mesh, HoverHeight, HoverForce, GravityForce);
@@ -109,6 +109,10 @@ void ACPP_Vehicle::Tick(float DeltaTime)
 	// Smooth out Spring Arm length and offset movements
 	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, CameraCurrentZoom, DeltaTime, CameraInterpolationSpeed);
 	SpringArm->SocketOffset.Y = FMath::FInterpTo(SpringArm->SocketOffset.Y, CameraCurrentOffset, DeltaTime, CameraInterpolationSpeed);
+
+	// Smooth out Center Of Mass Location
+	Test();
+	Mesh->SetCenterOfMass(FVector(0, 0, FMath::FInterpTo(Mesh->GetCenterOfMass().Z, -CenterOfMassHeight, DeltaTime, 100)));
 
 	// Clamp Mesh rotation
 	FRotator CurrentRotation = Mesh->GetComponentRotation();
@@ -134,6 +138,29 @@ void ACPP_Vehicle::SetupHoverComponent(UCPP_HoverComponent* HoverComponent, FVec
 void ACPP_Vehicle::TimelineDecelerationUpdate(float Alpha)
 {
 	Mesh->AddForce(Mesh->GetForwardVector() * AccelerationSpeed * Alpha, NAME_None, true);
+}
+
+void ACPP_Vehicle::Test()
+{
+	FVector WorldLocation = Mesh->GetComponentLocation();
+	FVector UpVector = Mesh->GetUpVector();
+
+	FHitResult Hit;
+	FVector LineTraceEndLocation = (UpVector * -HoverHeight * 100) + WorldLocation;
+	UWorld* World = GetWorld();
+
+	bool bHit = World->LineTraceSingleByChannel(Hit, WorldLocation, LineTraceEndLocation, ECC_Visibility);
+	DrawDebugLine(World, WorldLocation, LineTraceEndLocation, FColor::Yellow);
+
+	if (Hit.Distance <= HoverHeight)
+	{
+		CenterOfMassHeight = 100;
+	}
+	else
+	{
+		//CenterOfMassHeight = (Hit.Distance - HoverHeight) / 1000;
+		CenterOfMassHeight = 0.f;
+	}
 }
 
 float ACPP_Vehicle::GetCurveBoostDuration()

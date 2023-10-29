@@ -111,7 +111,7 @@ void ACPP_VehiclePlayerController::HandleSteer(const FInputActionValue& InputAct
 	PlayerCharacter->SetCameraCurrentOffset(SteerValue > 0 ? PlayerCharacter->MaxCameraOffset : -PlayerCharacter->MaxCameraOffset);
 	Mesh->AddTorqueInDegrees(FVector(0, 0, SteerValue * SteeringSpeed), NAME_None, true);
 
-	FVector RightVector = Mesh->GetRightVector();
+	/*FVector RightVector = Mesh->GetRightVector();
 	USceneComponent* SteerLeft = PlayerCharacter->GetSteerLeftComponent();
 	USceneComponent* SteerRight = PlayerCharacter->GetSteerRightComponent();
 	FVector SteerLeftLocation = SteerLeft->GetComponentLocation();
@@ -119,7 +119,7 @@ void ACPP_VehiclePlayerController::HandleSteer(const FInputActionValue& InputAct
 	FVector Force = RightVector * SteeringRotationForce * (SteerValue > 0 ? 1 : -1);
 	FVector Location = SteerValue > 0 ? SteerRightLocation : SteerLeftLocation;
 
-	Mesh->AddForceAtLocation(Force, Location);
+	Mesh->AddForceAtLocation(Force, Location);*/
 }
 
 void ACPP_VehiclePlayerController::HandleStopSteer()

@@ -29,6 +29,7 @@ public:
 	// Functions
 	void SetupHoverComponent(UCPP_HoverComponent* HoverComponent, FVector Location);
 	void TimelineDecelerationUpdate(float Alpha);
+	void Test();
 	float GetCurveBoostDuration();
 
 	// Getter functions
@@ -181,7 +182,7 @@ public:
 	float AccelerationSpeed = 15000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
-	float SteeringSpeed = 500;
+	float SteeringSpeed = 800;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
 	float SteeringRotationForce = 80000;
@@ -194,16 +195,18 @@ public:
 
 	// Public attributes (Hover)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	float HoverHeight = 120;
+	float HoverHeight = 200;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	float HoverForce = 180000;
+	float HoverForce = 100000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	float LinearDamping = 3;
+	//float LinearDamping = 3.f;
+	float LinearDamping = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	float AngularDamping = 5;
+	//float AngularDamping = 5.f;
+	float AngularDamping = 3.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
 	float CenterOfMassHeight = -100;
