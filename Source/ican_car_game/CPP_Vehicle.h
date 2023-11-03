@@ -29,7 +29,7 @@ public:
 	// Functions
 	void SetupHoverComponent(UCPP_HoverComponent* HoverComponent, FVector Location);
 	void TimelineDecelerationUpdate(float Alpha);
-	void Test();
+	void UpdateCenterOfMass();
 	float GetCurveBoostDuration();
 
 	// Getter functions
@@ -139,7 +139,7 @@ protected:
 	float InitialAccelerationSpeed = 15000;
 
 	// Attributes (Magnetism)
-	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
+	UPROPERTY(BlueprintReadonly, Replicated, Category = "Magnetism")
 	EMagneticPolarity MagneticPolarity = EMagneticPolarity::POSITIVE;
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")

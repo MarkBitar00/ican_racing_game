@@ -4,9 +4,11 @@
 // Sets default values
 ACPP_Vehicle::ACPP_Vehicle()
 {
- 	// Set this Pawn to call Tick() every frame
+ 	// Set this Pawn to call Tick() every frame and enable replication
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+	SetReplicates(true);
+	SetReplicateMovement(true);
 
 	// Create Mesh, Materials for Magnetic Polarity and set Root Component with default Scale and Material
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
@@ -111,7 +113,7 @@ void ACPP_Vehicle::Tick(float DeltaTime)
 	SpringArm->SocketOffset.Y = FMath::FInterpTo(SpringArm->SocketOffset.Y, CameraCurrentOffset, DeltaTime, CameraInterpolationSpeed);
 
 	// Smooth out Center Of Mass Location
-	Test();
+	UpdateCenterOfMass();
 	Mesh->SetCenterOfMass(FVector(0, 0, FMath::FInterpTo(Mesh->GetCenterOfMass().Z, -CenterOfMassHeight, DeltaTime, 100)));
 
 	// Clamp Mesh rotation
@@ -140,7 +142,7 @@ void ACPP_Vehicle::TimelineDecelerationUpdate(float Alpha)
 	Mesh->AddForce(Mesh->GetForwardVector() * AccelerationSpeed * Alpha, NAME_None, true);
 }
 
-void ACPP_Vehicle::Test()
+void ACPP_Vehicle::UpdateCenterOfMass()
 {
 	FVector WorldLocation = Mesh->GetComponentLocation();
 	FVector UpVector = Mesh->GetUpVector();
