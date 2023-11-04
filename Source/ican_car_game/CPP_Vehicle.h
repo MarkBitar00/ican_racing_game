@@ -139,7 +139,7 @@ protected:
 	float InitialAccelerationSpeed = 15000;
 
 	// Attributes (Magnetism)
-	UPROPERTY(BlueprintReadonly, Replicated, Category = "Magnetism")
+	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	EMagneticPolarity MagneticPolarity = EMagneticPolarity::POSITIVE;
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
