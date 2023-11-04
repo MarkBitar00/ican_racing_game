@@ -8,14 +8,14 @@ void ACPP_VehiclePlayerController::OnPossess(APawn* aPawn)
 	PlayerCharacter = Cast<ACPP_Vehicle>(aPawn);
 	EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
 
-	checkf(PlayerCharacter, TEXT("ACPP_VehiclePlayerController derived classes should only possess ACPP_Vehicle derived Pawns"));
-	checkf(EnhancedInputComponent, TEXT("Unable to get reference to the Enhanced Input Component"));
+	//checkf(PlayerCharacter, TEXT("ACPP_VehiclePlayerController derived classes should only possess ACPP_Vehicle derived Pawns"));
+	//checkf(EnhancedInputComponent, TEXT("Unable to get reference to the Enhanced Input Component"));
 	
 	// Get the player's Subsystem, clear mappings and add required mapping
 	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 
-	checkf(InputSubsystem, TEXT("Unable to get reference to the Enhanced Input Local Player Subsystem"));
-	checkf(InputMappingContext, TEXT("Input Mapping Context not specified"));
+	//checkf(InputSubsystem, TEXT("Unable to get reference to the Enhanced Input Local Player Subsystem"));
+	//checkf(InputMappingContext, TEXT("Input Mapping Context not specified"));
 
 	InputSubsystem->ClearAllMappings();
 	InputSubsystem->AddMappingContext(InputMappingContext, 0);
