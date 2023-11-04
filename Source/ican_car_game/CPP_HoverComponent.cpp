@@ -49,20 +49,18 @@ void UCPP_HoverComponent::Hover()
 	bool bHit = World->LineTraceSingleByChannel(Hit, WorldLocation, LineTraceEndLocation, ECC_Visibility);
 	DrawDebugLine(World, WorldLocation, LineTraceEndLocation, FColor::Red);
 
-	//if (bHit)
 	if (Hit.Distance <= HoverHeight)
 	{
 		float LerpAlpha = (Hit.Location - WorldLocation).Length() / HoverHeight;
 		float LerpValue = FMath::Lerp(HoverForce, 0, LerpAlpha);
 		float CurveValue = CurveHover->GetFloatValue(Hit.Distance / HoverHeight);
-		//float CurveValue = 5;
 
 		FVector Force = Hit.ImpactNormal * LerpValue * CurveValue;
 		HoverParent->AddForceAtLocation(Force, WorldLocation);
 	}
-	else if (Hit.Distance > HoverHeight * 3)
+	else if (Hit.Distance > HoverHeight * 2)
 	{
-		FVector Force = WorldLocation + (GravityForce * FVector(0, 0, -Hit.Distance / 10));
+		FVector Force = WorldLocation + (GravityForce * FVector(0, 0, -Hit.Distance / 2));
 		HoverParent->AddForceAtLocation(Force, WorldLocation);
 	}
 }

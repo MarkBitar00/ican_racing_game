@@ -4,11 +4,9 @@
 // Sets default values
 ACPP_Vehicle::ACPP_Vehicle()
 {
- 	// Set this Pawn to call Tick() every frame and enable replication
+ 	// Set this Pawn to call Tick() every frame
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
-	SetReplicates(true);
-	SetReplicateMovement(true);
 
 	// Create Mesh, Materials for Magnetic Polarity and set Root Component with default Scale and Material
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
@@ -37,14 +35,16 @@ ACPP_Vehicle::ACPP_Vehicle()
 	Camera->SetupAttachment(SpringArm);
 
 	// Create and setup Hover Components
+	//FVector HoverVector = FVector(45, -45, -50);
+	FVector HoverVector = FVector(50, -50, 0);
 	HoverFrontLeft = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverFrontLeft"));
-	SetupHoverComponent(HoverFrontLeft, FVector(50, -50, 0));
+	SetupHoverComponent(HoverFrontLeft, HoverVector);
 	HoverFrontRight = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverFrontRight"));
-	SetupHoverComponent(HoverFrontRight, FVector(50, 50, 0));
+	SetupHoverComponent(HoverFrontRight, HoverVector);
 	HoverBackLeft = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverBackLeft"));
-	SetupHoverComponent(HoverBackLeft, FVector(-50, -50, 0));
+	SetupHoverComponent(HoverBackLeft, HoverVector);
 	HoverBackRight = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverBackRight"));
-	SetupHoverComponent(HoverBackRight, FVector(-50, 50, 0));
+	SetupHoverComponent(HoverBackRight, HoverVector);
 
 	// Create and setup Steer locations
 	SteerLeftLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SteerLeftLocation"));

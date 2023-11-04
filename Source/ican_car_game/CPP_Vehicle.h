@@ -182,7 +182,7 @@ public:
 	float AccelerationSpeed = 15000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
-	float SteeringSpeed = 800;
+	float SteeringSpeed = 500;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
 	float SteeringRotationForce = 80000;
@@ -195,18 +195,16 @@ public:
 
 	// Public attributes (Hover)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	float HoverHeight = 200;
+	float HoverHeight = 150;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	float HoverForce = 100000;
+	float HoverForce = 150000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	//float LinearDamping = 3.f;
-	float LinearDamping = 1.f;
+	float LinearDamping = 3.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	//float AngularDamping = 5.f;
-	float AngularDamping = 3.f;
+	float AngularDamping = 5.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
 	float CenterOfMassHeight = -100;
