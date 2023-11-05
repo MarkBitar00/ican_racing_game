@@ -136,7 +136,7 @@ protected:
 
 	// Attributes (Movement)
 	UPROPERTY(BlueprintReadonly, Category = "Movement")
-	float InitialAccelerationSpeed = 15000;
+	float InitialAccelerationSpeed = 12000;
 
 	// Attributes (Magnetism)
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
@@ -179,7 +179,7 @@ public:
 
 	// Public attributes (Movement)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
-	float AccelerationSpeed = 15000;
+	float AccelerationSpeed = 12000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
 	float SteeringSpeed = 500;

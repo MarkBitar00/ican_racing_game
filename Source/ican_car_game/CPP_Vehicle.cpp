@@ -35,7 +35,6 @@ ACPP_Vehicle::ACPP_Vehicle()
 	Camera->SetupAttachment(SpringArm);
 
 	// Create and setup Hover Components
-	//FVector HoverVector = FVector(45, -45, -50);
 	FVector HoverVector = FVector(50, -50, 0);
 	HoverFrontLeft = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverFrontLeft"));
 	SetupHoverComponent(HoverFrontLeft, HoverVector);
@@ -156,11 +155,10 @@ void ACPP_Vehicle::UpdateCenterOfMass()
 
 	if (Hit.Distance <= HoverHeight)
 	{
-		CenterOfMassHeight = 100;
+		CenterOfMassHeight = 100.f;
 	}
 	else
 	{
-		//CenterOfMassHeight = (Hit.Distance - HoverHeight) / 1000;
 		CenterOfMassHeight = 0.f;
 	}
 }

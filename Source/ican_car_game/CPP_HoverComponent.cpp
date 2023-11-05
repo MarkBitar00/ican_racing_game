@@ -8,9 +8,12 @@ UCPP_HoverComponent::UCPP_HoverComponent()
 
 	// Create Curve Hover and set default
 	CurveHover = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveHover"));
+	CurveGravity = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveGravity"));
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>
-		CurveFile(TEXT("/Game/Utils/Curves/SuspensionCurve"));
-	CurveHover = CurveFile.Object;
+		CurveHoverFile(TEXT("/Game/Utils/Curves/SuspensionCurve")),
+		CurveGravityFile(TEXT("/Game/Utils/Curves/GravityCurve"));
+	CurveHover = CurveHoverFile.Object;
+	CurveGravity = CurveGravityFile.Object;
 }
 
 // Called when the game starts
@@ -53,14 +56,16 @@ void UCPP_HoverComponent::Hover()
 	{
 		float LerpAlpha = (Hit.Location - WorldLocation).Length() / HoverHeight;
 		float LerpValue = FMath::Lerp(HoverForce, 0, LerpAlpha);
-		float CurveValue = CurveHover->GetFloatValue(Hit.Distance / HoverHeight);
+		float CurveHoverValue = CurveHover->GetFloatValue(Hit.Distance / HoverHeight);
 
-		FVector Force = Hit.ImpactNormal * LerpValue * CurveValue;
+		FVector Force = Hit.ImpactNormal * LerpValue * CurveHoverValue;
 		HoverParent->AddForceAtLocation(Force, WorldLocation);
 	}
-	else if (Hit.Distance > HoverHeight * 2)
+	else
 	{
-		FVector Force = WorldLocation + (GravityForce * FVector(0, 0, -Hit.Distance / 2));
+		float CurveGravityValue = CurveGravity->GetFloatValue(Hit.Distance / HoverHeight);
+
+		FVector Force = WorldLocation + (GravityForce * FVector(0, 0, -Hit.Distance / CurveGravityValue));
 		HoverParent->AddForceAtLocation(Force, WorldLocation);
 	}
 }
