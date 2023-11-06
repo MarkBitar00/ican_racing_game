@@ -5,7 +5,8 @@ void ACPP_RacerPlayerController::OnPossess(APawn* aPawn)
 	Super::OnPossess(aPawn);
 
 	// Store references to the player's Pawn and the Enhanced Input Component
-	PlayerCharacter = Cast<ACPP_Racer>(aPawn);
+	//PlayerCharacter = Cast<ACPP_Racer>(aPawn);
+	PlayerCharacter = Cast<ACPP_Vehicle>(aPawn);
 	EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
 
 	checkf(PlayerCharacter, TEXT("ACPP_RacerPlayerController derived classes should only possess ACPP_Racer derived Pawns"));

@@ -4,7 +4,8 @@
 #include "GameFramework/PlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "CPP_Racer.h"
+//#include "CPP_Racer.h"
+#include "CPP_Vehicle.h"
 #include "CPP_Magnet.h"
 #include "CPP_RacerPlayerController.generated.h"
 
@@ -60,7 +61,8 @@ private:
 
 	// Controlled Pawn
 	UPROPERTY()
-	ACPP_Racer* PlayerCharacter = nullptr;
+	//ACPP_Racer* PlayerCharacter = nullptr;
+	ACPP_Vehicle* PlayerCharacter = nullptr;
 
 	// Timer
 	FTimerHandle PolarityTimerHandle;
