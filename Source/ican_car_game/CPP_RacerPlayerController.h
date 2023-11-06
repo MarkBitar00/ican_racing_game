@@ -4,22 +4,22 @@
 #include "GameFramework/PlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "CPP_Vehicle.h"
+#include "CPP_Racer.h"
 #include "CPP_Magnet.h"
-#include "CPP_VehiclePlayerController.generated.h"
+#include "CPP_RacerPlayerController.generated.h"
 
-UCLASS(ABSTRACT)
-class ICAN_CAR_GAME_API ACPP_VehiclePlayerController : public APlayerController
+UCLASS()
+class ICAN_CAR_GAME_API ACPP_RacerPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-
+	
 public:
 	// Input Mapping Context
 	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "Player Inputs")
 	UInputMappingContext* InputMappingContext = nullptr;
 
 	// Input Actions
-	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category="Player Inputs")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "Player Inputs")
 	UInputAction* ActionAccelerate = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "Player Inputs")
@@ -60,7 +60,7 @@ private:
 
 	// Controlled Pawn
 	UPROPERTY()
-	ACPP_Vehicle* PlayerCharacter = nullptr;
+	ACPP_Racer* PlayerCharacter = nullptr;
 
 	// Timer
 	FTimerHandle PolarityTimerHandle;

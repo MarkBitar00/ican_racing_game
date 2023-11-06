@@ -4,21 +4,19 @@
 #include "GameFramework/Pawn.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/TimelineComponent.h"
-#include "CPP_HoverComponent.h"
 #include "CPP_E_MagneticPolarity.h"
-#include "CPP_Vehicle.generated.h"
-
-class ACPP_Magnet;
+#include "CPP_Racer.generated.h"
 
 UCLASS()
-class ICAN_CAR_GAME_API ACPP_Vehicle : public APawn
+class ICAN_CAR_GAME_API ACPP_Racer : public APawn
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this Pawn's properties
-	ACPP_Vehicle();
+	// Sets default values for this pawn's properties
+	ACPP_Racer();
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -27,13 +25,14 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// Functions
-	void SetupHoverComponent(UCPP_HoverComponent* HoverComponent, FVector Location);
 	void TimelineDecelerationUpdate(float Alpha);
-	void UpdateCenterOfMass();
 	float GetCurveBoostDuration();
 
 	// Getter functions
 	// Getter functions (Components)
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Components")
+	FORCEINLINE class UCapsuleComponent* GetCollisionCapsule() const { return CollisionCapsule; }
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Components")
 	FORCEINLINE class UStaticMeshComponent* GetMesh() const { return Mesh; }
 
@@ -106,26 +105,17 @@ protected:
 	virtual void BeginPlay() override;
 
 	// Pawn components
-	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category="Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
+	UCapsuleComponent* CollisionCapsule;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
 	UStaticMeshComponent* Mesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category="Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
 	UCameraComponent* Camera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
 	USpringArmComponent* SpringArm;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
-	UCPP_HoverComponent* HoverFrontLeft;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
-	UCPP_HoverComponent* HoverFrontRight;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
-	UCPP_HoverComponent* HoverBackLeft;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
-	UCPP_HoverComponent* HoverBackRight;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
 	USceneComponent* SteerLeftLocation;
@@ -201,25 +191,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
 	float MaxDecelerationDuration = 3;
-
-	// Public attributes (Hover)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	float HoverHeight = 150;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	float HoverForce = 150000;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	float LinearDamping = 3;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	float AngularDamping = 5;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	float CenterOfMassHeight = -100;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	float GravityForce = 3000;
 
 	// Public attributes (Magnetism)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")

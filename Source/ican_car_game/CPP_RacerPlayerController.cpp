@@ -1,16 +1,16 @@
-#include "CPP_VehiclePlayerController.h"
+#include "CPP_RacerPlayerController.h"
 
-void ACPP_VehiclePlayerController::OnPossess(APawn* aPawn)
+void ACPP_RacerPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 
 	// Store references to the player's Pawn and the Enhanced Input Component
-	PlayerCharacter = Cast<ACPP_Vehicle>(aPawn);
+	PlayerCharacter = Cast<ACPP_Racer>(aPawn);
 	EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
 
-	checkf(PlayerCharacter, TEXT("ACPP_VehiclePlayerController derived classes should only possess ACPP_Vehicle derived Pawns"));
+	checkf(PlayerCharacter, TEXT("ACPP_RacerPlayerController derived classes should only possess ACPP_Racer derived Pawns"));
 	checkf(EnhancedInputComponent, TEXT("Unable to get reference to the Enhanced Input Component"));
-	
+
 	// Get the player's Subsystem, clear mappings and add required mapping
 	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 
@@ -24,32 +24,32 @@ void ACPP_VehiclePlayerController::OnPossess(APawn* aPawn)
 	// Bind Accelerate Input Action handlers
 	if (ActionAccelerate)
 	{
-		EnhancedInputComponent->BindAction(ActionAccelerate, ETriggerEvent::Triggered, this, &ACPP_VehiclePlayerController::HandleAccelerate);
-		EnhancedInputComponent->BindAction(ActionAccelerate, ETriggerEvent::Started, this, &ACPP_VehiclePlayerController::HandleStartAccelerate);
-		EnhancedInputComponent->BindAction(ActionAccelerate, ETriggerEvent::Completed, this, &ACPP_VehiclePlayerController::HandleStopAccelerate);
+		EnhancedInputComponent->BindAction(ActionAccelerate, ETriggerEvent::Triggered, this, &ACPP_RacerPlayerController::HandleAccelerate);
+		EnhancedInputComponent->BindAction(ActionAccelerate, ETriggerEvent::Started, this, &ACPP_RacerPlayerController::HandleStartAccelerate);
+		EnhancedInputComponent->BindAction(ActionAccelerate, ETriggerEvent::Completed, this, &ACPP_RacerPlayerController::HandleStopAccelerate);
 	}
 
 	// Bind Brake Input Action handlers
 	if (ActionBrake)
 	{
-		EnhancedInputComponent->BindAction(ActionBrake, ETriggerEvent::Started, this, &ACPP_VehiclePlayerController::HandleStartBrake);
-		EnhancedInputComponent->BindAction(ActionBrake, ETriggerEvent::Completed, this, &ACPP_VehiclePlayerController::HandleStopBrake);
+		EnhancedInputComponent->BindAction(ActionBrake, ETriggerEvent::Started, this, &ACPP_RacerPlayerController::HandleStartBrake);
+		EnhancedInputComponent->BindAction(ActionBrake, ETriggerEvent::Completed, this, &ACPP_RacerPlayerController::HandleStopBrake);
 	}
 
 	// Bind Steer Input Action handlers
 	if (ActionSteer)
 	{
-		EnhancedInputComponent->BindAction(ActionSteer, ETriggerEvent::Triggered, this, &ACPP_VehiclePlayerController::HandleSteer);
-		EnhancedInputComponent->BindAction(ActionSteer, ETriggerEvent::Canceled, this, &ACPP_VehiclePlayerController::HandleStopSteer);
-		EnhancedInputComponent->BindAction(ActionSteer, ETriggerEvent::Completed, this, &ACPP_VehiclePlayerController::HandleStopSteer);
+		EnhancedInputComponent->BindAction(ActionSteer, ETriggerEvent::Triggered, this, &ACPP_RacerPlayerController::HandleSteer);
+		EnhancedInputComponent->BindAction(ActionSteer, ETriggerEvent::Canceled, this, &ACPP_RacerPlayerController::HandleStopSteer);
+		EnhancedInputComponent->BindAction(ActionSteer, ETriggerEvent::Completed, this, &ACPP_RacerPlayerController::HandleStopSteer);
 	}
 
 	// Bind Toggle Polarity Input Action handler
 	if (ActionTogglePolarity)
-		EnhancedInputComponent->BindAction(ActionTogglePolarity, ETriggerEvent::Started, this, &ACPP_VehiclePlayerController::HandleTogglePolarity);
+		EnhancedInputComponent->BindAction(ActionTogglePolarity, ETriggerEvent::Started, this, &ACPP_RacerPlayerController::HandleTogglePolarity);
 }
 
-void ACPP_VehiclePlayerController::OnUnPossess()
+void ACPP_RacerPlayerController::OnUnPossess()
 {
 	EnhancedInputComponent->ClearActionBindings();
 
@@ -58,7 +58,7 @@ void ACPP_VehiclePlayerController::OnUnPossess()
 
 // Input Action handlers
 // Accelerate Input Action handlers
-void ACPP_VehiclePlayerController::HandleAccelerate(const FInputActionValue& InputActionValue)
+void ACPP_RacerPlayerController::HandleAccelerate(const FInputActionValue& InputActionValue)
 {
 	const float AccelerationValue = InputActionValue.Get<float>();
 	float AccelerationSpeed = PlayerCharacter->AccelerationSpeed;
@@ -68,12 +68,12 @@ void ACPP_VehiclePlayerController::HandleAccelerate(const FInputActionValue& Inp
 	Mesh->AddForce(ForwardVector * AccelerationSpeed * AccelerationValue, NAME_None, true);
 }
 
-void ACPP_VehiclePlayerController::HandleStartAccelerate()
+void ACPP_RacerPlayerController::HandleStartAccelerate()
 {
 	PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->MaxCameraZoom);
 }
 
-void ACPP_VehiclePlayerController::HandleStopAccelerate(const FInputActionInstance& InputActionInstance)
+void ACPP_RacerPlayerController::HandleStopAccelerate(const FInputActionInstance& InputActionInstance)
 {
 	const float AccelerationDuration = InputActionInstance.GetTriggeredTime();
 	float DecelerationTimelinePlayRate = 1 / FMath::Clamp(AccelerationDuration, 0, PlayerCharacter->MaxDecelerationDuration);
@@ -85,7 +85,7 @@ void ACPP_VehiclePlayerController::HandleStopAccelerate(const FInputActionInstan
 }
 
 // Brake Input Action handlers
-void ACPP_VehiclePlayerController::HandleStartBrake()
+void ACPP_RacerPlayerController::HandleStartBrake()
 {
 	UTimelineComponent* DecelerationTimeline = PlayerCharacter->GetDecelerationTimeline();
 
@@ -95,13 +95,13 @@ void ACPP_VehiclePlayerController::HandleStartBrake()
 	DecelerationTimeline->Stop();
 }
 
-void ACPP_VehiclePlayerController::HandleStopBrake()
+void ACPP_RacerPlayerController::HandleStopBrake()
 {
 	PlayerCharacter->AccelerationSpeed = PlayerCharacter->GetInitialAccelerationSpeed();
 }
 
 // Steer Input Action handlers
-void ACPP_VehiclePlayerController::HandleSteer(const FInputActionValue& InputActionValue)
+void ACPP_RacerPlayerController::HandleSteer(const FInputActionValue& InputActionValue)
 {
 	const float SteerValue = InputActionValue.Get<float>();
 	float SteeringSpeed = PlayerCharacter->SteeringSpeed;
@@ -111,7 +111,7 @@ void ACPP_VehiclePlayerController::HandleSteer(const FInputActionValue& InputAct
 	PlayerCharacter->SetCameraCurrentOffset(SteerValue > 0 ? PlayerCharacter->MaxCameraOffset : -PlayerCharacter->MaxCameraOffset);
 	Mesh->AddTorqueInDegrees(FVector(0, 0, SteerValue * SteeringSpeed), NAME_None, true);
 
-	FVector RightVector = Mesh->GetRightVector();
+	/*FVector RightVector = Mesh->GetRightVector();
 	USceneComponent* SteerLeft = PlayerCharacter->GetSteerLeftComponent();
 	USceneComponent* SteerRight = PlayerCharacter->GetSteerRightComponent();
 	FVector SteerLeftLocation = SteerLeft->GetComponentLocation();
@@ -119,16 +119,16 @@ void ACPP_VehiclePlayerController::HandleSteer(const FInputActionValue& InputAct
 	FVector Force = RightVector * SteeringRotationForce * (SteerValue > 0 ? 1 : -1);
 	FVector Location = SteerValue > 0 ? SteerRightLocation : SteerLeftLocation;
 
-	Mesh->AddForceAtLocation(Force, Location);
+	Mesh->AddForceAtLocation(Force, Location);*/
 }
 
-void ACPP_VehiclePlayerController::HandleStopSteer()
+void ACPP_RacerPlayerController::HandleStopSteer()
 {
 	PlayerCharacter->SetCameraCurrentOffset(0);
 }
 
 // Toggle Polarity Input Action handler
-void ACPP_VehiclePlayerController::HandleTogglePolarity()
+void ACPP_RacerPlayerController::HandleTogglePolarity()
 {
 	if (!PlayerCharacter->GetCanSwitchPolarity()) return;
 
@@ -144,7 +144,7 @@ void ACPP_VehiclePlayerController::HandleTogglePolarity()
 	Mesh->SetMaterial(0, NewPolarity == EMagneticPolarity::POSITIVE ? PlayerCharacter->GetMaterialPositive() : PlayerCharacter->GetMaterialNegative());
 
 	PlayerCharacter->SetCanSwitchPolarity(false);
-	GetWorld()->GetTimerManager().SetTimer(PolarityTimerHandle, this, &ACPP_VehiclePlayerController::OnPolarityTimerEnd, 1, false, PolarityDelay);
+	GetWorld()->GetTimerManager().SetTimer(PolarityTimerHandle, this, &ACPP_RacerPlayerController::OnPolarityTimerEnd, 1, false, PolarityDelay);
 
 	if (Magnet == nullptr) return;
 	if (Magnet->GetMagneticPolarity() == NewPolarity)
@@ -154,7 +154,7 @@ void ACPP_VehiclePlayerController::HandleTogglePolarity()
 		PlayerCharacter->AccelerationSpeed *= CurveFloatValue;
 		PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->GetCameraCurrentZoom() * CurveFloatValue);
 
-		GetWorld()->GetTimerManager().SetTimer(BoostTimerHandle, this, &ACPP_VehiclePlayerController::OnBoostTimerEnd, 1, false, CurveFloatValue);
+		GetWorld()->GetTimerManager().SetTimer(BoostTimerHandle, this, &ACPP_RacerPlayerController::OnBoostTimerEnd, 1, false, CurveFloatValue);
 	}
 	else
 	{
@@ -162,13 +162,13 @@ void ACPP_VehiclePlayerController::HandleTogglePolarity()
 	}
 }
 
-void ACPP_VehiclePlayerController::OnPolarityTimerEnd()
+void ACPP_RacerPlayerController::OnPolarityTimerEnd()
 {
 	PlayerCharacter->SetCanSwitchPolarity(true);
 }
 
 // Reset Acceleration Speed and Spring Arm Length when boost ends
-void ACPP_VehiclePlayerController::OnBoostTimerEnd()
+void ACPP_RacerPlayerController::OnBoostTimerEnd()
 {
 	PlayerCharacter->AccelerationSpeed = PlayerCharacter->GetInitialAccelerationSpeed();
 	PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->MaxCameraZoom);
