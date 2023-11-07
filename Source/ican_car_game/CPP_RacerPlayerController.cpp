@@ -5,8 +5,7 @@ void ACPP_RacerPlayerController::OnPossess(APawn* aPawn)
 	Super::OnPossess(aPawn);
 
 	// Store references to the player's Pawn and the Enhanced Input Component
-	//PlayerCharacter = Cast<ACPP_Racer>(aPawn);
-	PlayerCharacter = Cast<ACPP_Vehicle>(aPawn);
+	PlayerCharacter = Cast<ACPP_Racer>(aPawn);
 	EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
 
 	checkf(PlayerCharacter, TEXT("ACPP_RacerPlayerController derived classes should only possess ACPP_Racer derived Pawns"));
@@ -63,10 +62,9 @@ void ACPP_RacerPlayerController::HandleAccelerate(const FInputActionValue& Input
 {
 	const float AccelerationValue = InputActionValue.Get<float>();
 	float AccelerationSpeed = PlayerCharacter->AccelerationSpeed;
-	UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(PlayerCharacter->GetRootComponent());
-	FVector ForwardVector = Mesh->GetForwardVector();
+	FVector ForwardVector = PlayerCharacter->GetActorForwardVector();
 
-	Mesh->AddForce(ForwardVector * AccelerationSpeed * AccelerationValue, NAME_None, true);
+	PlayerCharacter->AddMovementInput(ForwardVector, AccelerationSpeed * AccelerationValue, true);
 }
 
 void ACPP_RacerPlayerController::HandleStartAccelerate()
@@ -76,51 +74,30 @@ void ACPP_RacerPlayerController::HandleStartAccelerate()
 
 void ACPP_RacerPlayerController::HandleStopAccelerate(const FInputActionInstance& InputActionInstance)
 {
-	const float AccelerationDuration = InputActionInstance.GetTriggeredTime();
-	float DecelerationTimelinePlayRate = 1 / FMath::Clamp(AccelerationDuration, 0, PlayerCharacter->MaxDecelerationDuration);
-	UTimelineComponent* DecelerationTimeline = PlayerCharacter->GetDecelerationTimeline();
-
 	PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->CameraInitialZoom);
-	DecelerationTimeline->SetPlayRate(DecelerationTimelinePlayRate);
-	DecelerationTimeline->PlayFromStart();
 }
 
 // Brake Input Action handlers
 void ACPP_RacerPlayerController::HandleStartBrake()
 {
-	UTimelineComponent* DecelerationTimeline = PlayerCharacter->GetDecelerationTimeline();
-
-	PlayerCharacter->AccelerationSpeed = 0;
+	PlayerCharacter->GetMovement()->Deceleration = PlayerCharacter->MovementSpeed;
 	PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->CameraInitialZoom);
 	PlayerCharacter->SetCameraCurrentOffset(0);
-	DecelerationTimeline->Stop();
 }
 
 void ACPP_RacerPlayerController::HandleStopBrake()
 {
-	PlayerCharacter->AccelerationSpeed = PlayerCharacter->GetInitialAccelerationSpeed();
+	PlayerCharacter->GetMovement()->Deceleration = PlayerCharacter->DecelerationSpeed;
 }
 
 // Steer Input Action handlers
 void ACPP_RacerPlayerController::HandleSteer(const FInputActionValue& InputActionValue)
 {
 	const float SteerValue = InputActionValue.Get<float>();
-	float SteeringSpeed = PlayerCharacter->SteeringSpeed;
-	float SteeringRotationForce = PlayerCharacter->SteeringRotationForce;
-	UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(PlayerCharacter->GetRootComponent());
+	UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(PlayerCharacter->GetMesh());
 
 	PlayerCharacter->SetCameraCurrentOffset(SteerValue > 0 ? PlayerCharacter->MaxCameraOffset : -PlayerCharacter->MaxCameraOffset);
-	Mesh->AddTorqueInDegrees(FVector(0, 0, SteerValue * SteeringSpeed), NAME_None, true);
-
-	/*FVector RightVector = Mesh->GetRightVector();
-	USceneComponent* SteerLeft = PlayerCharacter->GetSteerLeftComponent();
-	USceneComponent* SteerRight = PlayerCharacter->GetSteerRightComponent();
-	FVector SteerLeftLocation = SteerLeft->GetComponentLocation();
-	FVector SteerRightLocation = SteerRight->GetComponentLocation();
-	FVector Force = RightVector * SteeringRotationForce * (SteerValue > 0 ? 1 : -1);
-	FVector Location = SteerValue > 0 ? SteerRightLocation : SteerLeftLocation;
-
-	Mesh->AddForceAtLocation(Force, Location);*/
+	PlayerCharacter->AddActorWorldRotation(FRotator(0, SteerValue * PlayerCharacter->SteeringSpeedMultiplier, 0));
 }
 
 void ACPP_RacerPlayerController::HandleStopSteer()
@@ -133,12 +110,12 @@ void ACPP_RacerPlayerController::HandleTogglePolarity()
 {
 	if (!PlayerCharacter->GetCanSwitchPolarity()) return;
 
-	UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(PlayerCharacter->GetRootComponent());
+	UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(PlayerCharacter->GetMesh());
 	EMagneticPolarity CurrentPolarity = PlayerCharacter->GetMagneticPolarity();
 	UCurveFloat* CurveBoost = PlayerCharacter->GetCurveBoost();
 	ACPP_Magnet* Magnet = PlayerCharacter->GetMagnetInRange();
 	float PolarityDelay = PlayerCharacter->PolarityDelay;
-
+	
 	EMagneticPolarity NewPolarity = CurrentPolarity == EMagneticPolarity::POSITIVE ? EMagneticPolarity::NEGATIVE : EMagneticPolarity::POSITIVE;
 
 	PlayerCharacter->SetMagneticPolarity(NewPolarity);
@@ -152,14 +129,14 @@ void ACPP_RacerPlayerController::HandleTogglePolarity()
 	{
 		float CurveFloatValue = CurveBoost->GetFloatValue(PlayerCharacter->GetCurveBoostDuration());
 
-		PlayerCharacter->AccelerationSpeed *= CurveFloatValue;
+		PlayerCharacter->MovementSpeed *= CurveFloatValue;
 		PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->GetCameraCurrentZoom() * CurveFloatValue);
 
 		GetWorld()->GetTimerManager().SetTimer(BoostTimerHandle, this, &ACPP_RacerPlayerController::OnBoostTimerEnd, 1, false, CurveFloatValue);
 	}
 	else
 	{
-		PlayerCharacter->AccelerationSpeed = PlayerCharacter->GetInitialAccelerationSpeed();
+		PlayerCharacter->MovementSpeed = PlayerCharacter->GetInitialMovementSpeed();
 	}
 }
 
@@ -171,6 +148,6 @@ void ACPP_RacerPlayerController::OnPolarityTimerEnd()
 // Reset Acceleration Speed and Spring Arm Length when boost ends
 void ACPP_RacerPlayerController::OnBoostTimerEnd()
 {
-	PlayerCharacter->AccelerationSpeed = PlayerCharacter->GetInitialAccelerationSpeed();
+	PlayerCharacter->MovementSpeed = PlayerCharacter->GetInitialMovementSpeed();
 	PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->MaxCameraZoom);
 }
