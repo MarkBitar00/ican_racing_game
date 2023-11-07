@@ -8,9 +8,12 @@ UCPP_HoverComponent::UCPP_HoverComponent()
 
 	// Create Curve Hover and set default
 	CurveHover = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveHover"));
+	CurveGravity = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveGravity"));
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>
-		CurveFile(TEXT("/Game/Utils/Curves/SuspensionCurve"));
-	CurveHover = CurveFile.Object;
+		CurveHoverFile(TEXT("/Game/Utils/Curves/SuspensionCurve")),
+		CurveGravityFile(TEXT("/Game/Utils/Curves/GravityCurve"));
+	CurveHover = CurveHoverFile.Object;
+	CurveGravity = CurveGravityFile.Object;
 }
 
 // Called when the game starts
@@ -43,24 +46,26 @@ void UCPP_HoverComponent::Hover()
 	FVector UpVector = GetUpVector();
 
 	FHitResult Hit;
-	FVector LineTraceEndLocation = (UpVector * -HoverHeight) + WorldLocation;
-	UWorld* world = GetWorld();
+	FVector LineTraceEndLocation = (UpVector * -HoverHeight * 100) + WorldLocation;
+	UWorld* World = GetWorld();
 
-	bool bHit = world->LineTraceSingleByChannel(Hit, WorldLocation, LineTraceEndLocation, ECC_Visibility);
-	DrawDebugLine(world, WorldLocation, LineTraceEndLocation, FColor::Red);
+	bool bHit = World->LineTraceSingleByChannel(Hit, WorldLocation, LineTraceEndLocation, ECC_Visibility);
+	DrawDebugLine(World, WorldLocation, LineTraceEndLocation, FColor::Red);
 
-	if (bHit)
+	if (Hit.Distance <= HoverHeight)
 	{
 		float LerpAlpha = (Hit.Location - WorldLocation).Length() / HoverHeight;
 		float LerpValue = FMath::Lerp(HoverForce, 0, LerpAlpha);
-		float CurveValue = CurveHover->GetFloatValue(Hit.Distance / HoverHeight);
+		float CurveHoverValue = CurveHover->GetFloatValue(Hit.Distance / HoverHeight);
 
-		FVector Force = Hit.ImpactNormal * LerpValue * CurveValue;
+		FVector Force = Hit.ImpactNormal * LerpValue * CurveHoverValue;
 		HoverParent->AddForceAtLocation(Force, WorldLocation);
 	}
 	else
 	{
-		FVector Force = WorldLocation + (GravityForce * FVector(0, 0, -100));
+		float CurveGravityValue = CurveGravity->GetFloatValue(Hit.Distance / HoverHeight);
+
+		FVector Force = WorldLocation + (GravityForce * FVector(0, 0, -Hit.Distance / CurveGravityValue));
 		HoverParent->AddForceAtLocation(Force, WorldLocation);
 	}
 }

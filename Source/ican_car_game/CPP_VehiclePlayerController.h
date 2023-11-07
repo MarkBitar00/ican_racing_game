@@ -63,6 +63,8 @@ private:
 	ACPP_Vehicle* PlayerCharacter = nullptr;
 
 	// Timer
-	FTimerHandle TimerHandle;
-	void OnTimerEnd();
+	FTimerHandle PolarityTimerHandle;
+	FTimerHandle BoostTimerHandle;
+	void OnPolarityTimerEnd();
+	void OnBoostTimerEnd();
 };

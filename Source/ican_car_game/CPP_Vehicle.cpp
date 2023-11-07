@@ -35,14 +35,15 @@ ACPP_Vehicle::ACPP_Vehicle()
 	Camera->SetupAttachment(SpringArm);
 
 	// Create and setup Hover Components
+	FVector HoverVector = FVector(50, -50, 0);
 	HoverFrontLeft = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverFrontLeft"));
-	SetupHoverComponent(HoverFrontLeft, FVector(45, -45, -50));
+	SetupHoverComponent(HoverFrontLeft, HoverVector);
 	HoverFrontRight = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverFrontRight"));
-	SetupHoverComponent(HoverFrontRight, FVector(45, 45, -50));
+	SetupHoverComponent(HoverFrontRight, HoverVector);
 	HoverBackLeft = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverBackLeft"));
-	SetupHoverComponent(HoverBackLeft, FVector(-45, -45, -50));
+	SetupHoverComponent(HoverBackLeft, HoverVector);
 	HoverBackRight = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverBackRight"));
-	SetupHoverComponent(HoverBackRight, FVector(-45, 45, -50));
+	SetupHoverComponent(HoverBackRight, HoverVector);
 
 	// Create and setup Steer locations
 	SteerLeftLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SteerLeftLocation"));
@@ -89,7 +90,6 @@ void ACPP_Vehicle::BeginPlay()
 	Mesh->SetSimulatePhysics(true);
 	Mesh->SetLinearDamping(LinearDamping);
 	Mesh->SetAngularDamping(AngularDamping);
-	Mesh->SetCenterOfMass(FVector(0, 0, CenterOfMassHeight));
 
 	// Initialize Hover Components
 	HoverFrontLeft->Init(Mesh, HoverHeight, HoverForce, GravityForce);
@@ -109,6 +109,10 @@ void ACPP_Vehicle::Tick(float DeltaTime)
 	// Smooth out Spring Arm length and offset movements
 	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, CameraCurrentZoom, DeltaTime, CameraInterpolationSpeed);
 	SpringArm->SocketOffset.Y = FMath::FInterpTo(SpringArm->SocketOffset.Y, CameraCurrentOffset, DeltaTime, CameraInterpolationSpeed);
+
+	// Smooth out Center Of Mass Location
+	UpdateCenterOfMass();
+	Mesh->SetCenterOfMass(FVector(0, 0, FMath::FInterpTo(Mesh->GetCenterOfMass().Z, -CenterOfMassHeight, DeltaTime, 100)));
 
 	// Clamp Mesh rotation
 	FRotator CurrentRotation = Mesh->GetComponentRotation();
@@ -136,6 +140,28 @@ void ACPP_Vehicle::TimelineDecelerationUpdate(float Alpha)
 	Mesh->AddForce(Mesh->GetForwardVector() * AccelerationSpeed * Alpha, NAME_None, true);
 }
 
+void ACPP_Vehicle::UpdateCenterOfMass()
+{
+	FVector WorldLocation = Mesh->GetComponentLocation();
+	FVector UpVector = Mesh->GetUpVector();
+
+	FHitResult Hit;
+	FVector LineTraceEndLocation = (UpVector * -HoverHeight * 100) + WorldLocation;
+	UWorld* World = GetWorld();
+
+	bool bHit = World->LineTraceSingleByChannel(Hit, WorldLocation, LineTraceEndLocation, ECC_Visibility);
+	DrawDebugLine(World, WorldLocation, LineTraceEndLocation, FColor::Yellow);
+
+	if (Hit.Distance <= HoverHeight)
+	{
+		CenterOfMassHeight = 100;
+	}
+	else
+	{
+		CenterOfMassHeight = 0;
+	}
+}
+
 float ACPP_Vehicle::GetCurveBoostDuration()
 {
 	if (MagnetInRange == nullptr) return 0;
@@ -160,6 +186,11 @@ float ACPP_Vehicle::GetInitialAccelerationSpeed()
 }
 
 // Get Magnetism properties
+bool ACPP_Vehicle::GetCanSwitchPolarity()
+{
+	return bCanSwitchPolarity;
+}
+
 EMagneticPolarity ACPP_Vehicle::GetMagneticPolarity()
 {
 	return MagneticPolarity;
@@ -177,6 +208,11 @@ void ACPP_Vehicle::SetCameraCurrentOffset(float Pitch)
 }
 
 // Set Magnetism properties
+void ACPP_Vehicle::SetCanSwitchPolarity(bool bCanSwitch)
+{
+	bCanSwitchPolarity = bCanSwitch;
+}
+
 void ACPP_Vehicle::SetMagneticPolarity(EMagneticPolarity Polarity)
 {
 	MagneticPolarity = Polarity;

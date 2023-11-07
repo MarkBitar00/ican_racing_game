@@ -29,6 +29,7 @@ public:
 	// Functions
 	void SetupHoverComponent(UCPP_HoverComponent* HoverComponent, FVector Location);
 	void TimelineDecelerationUpdate(float Alpha);
+	void UpdateCenterOfMass();
 	float GetCurveBoostDuration();
 
 	// Getter functions
@@ -65,6 +66,9 @@ public:
 
 	// Getter functions (Magnetism)
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
+	bool GetCanSwitchPolarity();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
 	EMagneticPolarity GetMagneticPolarity();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
@@ -88,6 +92,9 @@ public:
 	virtual void SetCameraCurrentOffset(float Pitch);
 
 	// Setter functions (Magnetism)
+	UFUNCTION(BlueprintCallable, Category = "Setters | Magnetism")
+	virtual void SetCanSwitchPolarity(bool bCanSwitch);
+
 	UFUNCTION(BlueprintCallable, Category = "Setters | Magnetism")
 	virtual void SetMagneticPolarity(EMagneticPolarity Polarity);
 
@@ -135,9 +142,12 @@ protected:
 
 	// Attributes (Movement)
 	UPROPERTY(BlueprintReadonly, Category = "Movement")
-	float InitialAccelerationSpeed = 15000;
+	float InitialAccelerationSpeed = 12000;
 
 	// Attributes (Magnetism)
+	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
+	bool bCanSwitchPolarity = true;
+
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	EMagneticPolarity MagneticPolarity = EMagneticPolarity::POSITIVE;
 
@@ -178,7 +188,7 @@ public:
 
 	// Public attributes (Movement)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
-	float AccelerationSpeed = 15000;
+	float AccelerationSpeed = 12000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
 	float SteeringSpeed = 500;
@@ -194,10 +204,10 @@ public:
 
 	// Public attributes (Hover)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	float HoverHeight = 120;
+	float HoverHeight = 150;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
-	float HoverForce = 180000;
+	float HoverForce = 150000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
 	float LinearDamping = 3;
@@ -210,6 +220,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Hover")
 	float GravityForce = 3000;
+
+	// Public attributes (Magnetism)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
+	float PolarityDelay = 1;
 
 private:
 	// Materials

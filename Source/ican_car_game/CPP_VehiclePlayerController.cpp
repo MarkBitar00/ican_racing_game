@@ -8,14 +8,14 @@ void ACPP_VehiclePlayerController::OnPossess(APawn* aPawn)
 	PlayerCharacter = Cast<ACPP_Vehicle>(aPawn);
 	EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
 
-	//checkf(PlayerCharacter, TEXT("ACPP_VehiclePlayerController derived classes should only possess ACPP_Vehicle derived Pawns"));
-	//checkf(EnhancedInputComponent, TEXT("Unable to get reference to the Enhanced Input Component"));
+	checkf(PlayerCharacter, TEXT("ACPP_VehiclePlayerController derived classes should only possess ACPP_Vehicle derived Pawns"));
+	checkf(EnhancedInputComponent, TEXT("Unable to get reference to the Enhanced Input Component"));
 	
 	// Get the player's Subsystem, clear mappings and add required mapping
 	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 
-	//checkf(InputSubsystem, TEXT("Unable to get reference to the Enhanced Input Local Player Subsystem"));
-	//checkf(InputMappingContext, TEXT("Input Mapping Context not specified"));
+	checkf(InputSubsystem, TEXT("Unable to get reference to the Enhanced Input Local Player Subsystem"));
+	checkf(InputMappingContext, TEXT("Input Mapping Context not specified"));
 
 	InputSubsystem->ClearAllMappings();
 	InputSubsystem->AddMappingContext(InputMappingContext, 0);
@@ -130,15 +130,21 @@ void ACPP_VehiclePlayerController::HandleStopSteer()
 // Toggle Polarity Input Action handler
 void ACPP_VehiclePlayerController::HandleTogglePolarity()
 {
+	if (!PlayerCharacter->GetCanSwitchPolarity()) return;
+
 	UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(PlayerCharacter->GetRootComponent());
 	EMagneticPolarity CurrentPolarity = PlayerCharacter->GetMagneticPolarity();
 	UCurveFloat* CurveBoost = PlayerCharacter->GetCurveBoost();
 	ACPP_Magnet* Magnet = PlayerCharacter->GetMagnetInRange();
+	float PolarityDelay = PlayerCharacter->PolarityDelay;
 
 	EMagneticPolarity NewPolarity = CurrentPolarity == EMagneticPolarity::POSITIVE ? EMagneticPolarity::NEGATIVE : EMagneticPolarity::POSITIVE;
 
 	PlayerCharacter->SetMagneticPolarity(NewPolarity);
 	Mesh->SetMaterial(0, NewPolarity == EMagneticPolarity::POSITIVE ? PlayerCharacter->GetMaterialPositive() : PlayerCharacter->GetMaterialNegative());
+
+	PlayerCharacter->SetCanSwitchPolarity(false);
+	GetWorld()->GetTimerManager().SetTimer(PolarityTimerHandle, this, &ACPP_VehiclePlayerController::OnPolarityTimerEnd, 1, false, PolarityDelay);
 
 	if (Magnet == nullptr) return;
 	if (Magnet->GetMagneticPolarity() == NewPolarity)
@@ -148,7 +154,7 @@ void ACPP_VehiclePlayerController::HandleTogglePolarity()
 		PlayerCharacter->AccelerationSpeed *= CurveFloatValue;
 		PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->GetCameraCurrentZoom() * CurveFloatValue);
 
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ACPP_VehiclePlayerController::OnTimerEnd, 1, false, CurveFloatValue);
+		GetWorld()->GetTimerManager().SetTimer(BoostTimerHandle, this, &ACPP_VehiclePlayerController::OnBoostTimerEnd, 1, false, CurveFloatValue);
 	}
 	else
 	{
@@ -156,8 +162,13 @@ void ACPP_VehiclePlayerController::HandleTogglePolarity()
 	}
 }
 
+void ACPP_VehiclePlayerController::OnPolarityTimerEnd()
+{
+	PlayerCharacter->SetCanSwitchPolarity(true);
+}
+
 // Reset Acceleration Speed and Spring Arm Length when boost ends
-void ACPP_VehiclePlayerController::OnTimerEnd()
+void ACPP_VehiclePlayerController::OnBoostTimerEnd()
 {
 	PlayerCharacter->AccelerationSpeed = PlayerCharacter->GetInitialAccelerationSpeed();
 	PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->MaxCameraZoom);

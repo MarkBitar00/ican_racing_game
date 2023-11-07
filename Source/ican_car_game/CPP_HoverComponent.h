@@ -46,4 +46,7 @@ private:
 
 	UPROPERTY()
 	UCurveFloat* CurveHover = nullptr;
+
+	UPROPERTY()
+	UCurveFloat* CurveGravity = nullptr;
 };
