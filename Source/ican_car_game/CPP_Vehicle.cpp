@@ -11,10 +11,6 @@ ACPP_Vehicle::ACPP_Vehicle()
 	// Create Mesh, Materials for Magnetic Polarity and set Root Component with default Scale and Material
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(Mesh);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh>
-		MeshFile(TEXT("/Engine/BasicShapes/Cube"));
-	Mesh->SetStaticMesh(MeshFile.Object);
-	Mesh->SetRelativeScale3D(FVector(2.4, 1.6, 0.8));
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance>
 		MaterialPositiveFile(TEXT("/Game/Materials/MaterialInstances/M_Positive")),
 		MaterialNegativeFile(TEXT("/Game/Materials/MaterialInstances/M_Negative"));
@@ -35,22 +31,19 @@ ACPP_Vehicle::ACPP_Vehicle()
 	Camera->SetupAttachment(SpringArm);
 
 	// Create and setup Hover Components
-	FVector HoverVector = FVector(50, -50, 0);
 	HoverFrontLeft = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverFrontLeft"));
-	SetupHoverComponent(HoverFrontLeft, HoverVector);
+	HoverFrontLeft->SetupAttachment(RootComponent);
 	HoverFrontRight = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverFrontRight"));
-	SetupHoverComponent(HoverFrontRight, HoverVector);
+	HoverFrontRight->SetupAttachment(RootComponent);
 	HoverBackLeft = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverBackLeft"));
-	SetupHoverComponent(HoverBackLeft, HoverVector);
+	HoverBackLeft->SetupAttachment(RootComponent);
 	HoverBackRight = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverBackRight"));
-	SetupHoverComponent(HoverBackRight, HoverVector);
+	HoverBackRight->SetupAttachment(RootComponent);
 
 	// Create and setup Steer locations
 	SteerLeftLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SteerLeftLocation"));
-	SteerLeftLocation->SetRelativeLocation(FVector(0, -50, 0));
 	SteerLeftLocation->SetupAttachment(RootComponent);
 	SteerRightLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SteerRightLocation"));
-	SteerRightLocation->SetRelativeLocation(FVector(0, 50, 0));
 	SteerRightLocation->SetupAttachment(RootComponent);
 
 	// Create Curves and set default
@@ -72,8 +65,8 @@ ACPP_Vehicle::ACPP_Vehicle()
 	TimelineDeceleration = CreateDefaultSubobject<UTimelineComponent>(TEXT("TimelineDeceleration"));
 	TimelineUpdate.BindUFunction(this, FName{ TEXT("TimelineDecelerationUpdate") });
 
-	// Add "Vehicle" tag
-	this->Tags.Add(FName("Vehicle"));
+	// Add tag for Magnet overlaps
+	this->Tags.Add(FName("HoverVehicle"));
 }
 
 // Called when the game starts or when spawned
@@ -125,13 +118,6 @@ void ACPP_Vehicle::Tick(float DeltaTime)
 void ACPP_Vehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-}
-
-// Set Hover Component relative location and attach it to Root Component
-void ACPP_Vehicle::SetupHoverComponent(UCPP_HoverComponent* HoverComponent, FVector Location)
-{
-	HoverComponent->SetRelativeLocation(Location);
-	HoverComponent->SetupAttachment(RootComponent);
 }
 
 // Called during the Deceleration Timeline's update event

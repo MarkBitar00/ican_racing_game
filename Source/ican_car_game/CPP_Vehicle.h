@@ -27,7 +27,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// Functions
-	void SetupHoverComponent(UCPP_HoverComponent* HoverComponent, FVector Location);
 	void TimelineDecelerationUpdate(float Alpha);
 	void UpdateCenterOfMass();
 	float GetCurveBoostDuration();
