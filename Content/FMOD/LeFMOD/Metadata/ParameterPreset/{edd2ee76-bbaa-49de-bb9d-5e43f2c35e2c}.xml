@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.02.00">
-	<object class="ParameterPreset" id="{892e3e8d-af03-4006-ad91-f72a5d933cd6}">
+	<object class="ParameterPreset" id="{edd2ee76-bbaa-49de-bb9d-5e43f2c35e2c}">
 		<property name="name">
-			<value>TurnAmount</value>
+			<value>Speed</value>
 		</property>
 		<relationship name="folder">
 			<destination>{e9cc732e-41f4-48eb-82f8-04c74df65aca}</destination>
 		</relationship>
 		<relationship name="parameter">
-			<destination>{aeda69fe-9a84-40fa-a3c6-077f43812f5a}</destination>
+			<destination>{7dea41c5-10a0-4548-a51b-e94aceda1d48}</destination>
 		</relationship>
 	</object>
-	<object class="GameParameter" id="{aeda69fe-9a84-40fa-a3c6-077f43812f5a}">
+	<object class="GameParameter" id="{7dea41c5-10a0-4548-a51b-e94aceda1d48}">
 		<property name="initialValue">
 			<value>0</value>
 		</property>
 		<property name="seekSpeed">
-			<value>0.96999996900558472</value>
+			<value>0.89999997615814209</value>
 		</property>
 	</object>
 </objects>
