@@ -31,7 +31,7 @@ ACPP_Vehicle::ACPP_Vehicle()
 	SpringArm->SocketOffset = FVector(0, 0, SpringArmTargetOffset);
 	SpringArm->bInheritPitch = false;
 	SpringArm->bInheritRoll = false;
-	SpringArm->bDoCollisionTest = false;
+	//SpringArm->bDoCollisionTest = false;
 
 	// Create Camera and attach it to Spring Arm
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
