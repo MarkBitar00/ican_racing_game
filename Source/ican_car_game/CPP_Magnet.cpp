@@ -72,7 +72,7 @@ void ACPP_Magnet::Tick(float DeltaTime)
 // Collision Sphere overlap functions
 void ACPP_Magnet::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!OtherActor->ActorHasTag(FName("Vehicle"))) return;
+	if (!OtherActor->ActorHasTag(FName("HoverVehicle"))) return;
 
 	ACPP_Vehicle* Vehicle = Cast<ACPP_Vehicle>(OtherActor);
 	Vehicle->SetMagnetInRange(this);
@@ -81,7 +81,7 @@ void ACPP_Magnet::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 
 void ACPP_Magnet::OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (!OtherActor->ActorHasTag(FName("Vehicle"))) return;
+	if (!OtherActor->ActorHasTag(FName("HoverVehicle"))) return;
 
 	ACPP_Vehicle* Vehicle = Cast<ACPP_Vehicle>(OtherActor);
 	Vehicle->SetMagnetInRange(nullptr);

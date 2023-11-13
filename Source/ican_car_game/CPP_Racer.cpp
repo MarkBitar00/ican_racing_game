@@ -11,10 +11,6 @@ ACPP_Racer::ACPP_Racer()
 	// Create Mesh, Materials for Magnetic Polarity and set Root Component with default Scale and Material
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(Mesh);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh>
-		MeshFile(TEXT("/Engine/BasicShapes/Cube"));
-	Mesh->SetStaticMesh(MeshFile.Object);
-	Mesh->SetRelativeScale3D(FVector(2.4, 1.6, 0.8));
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance>
 		MaterialPositiveFile(TEXT("/Game/Materials/MaterialInstances/M_Positive")),
 		MaterialNegativeFile(TEXT("/Game/Materials/MaterialInstances/M_Negative"));
@@ -52,8 +48,8 @@ ACPP_Racer::ACPP_Racer()
 	CurveRepulsion = CurveRepulsionFile.Object;
 	CurveBoost = CurveBoostFile.Object;
 
-	// Add "Vehicle" tag
-	this->Tags.Add(FName("Vehicle"));
+	// Add tag for Magnet overlaps
+	this->Tags.Add(FName("Racer"));
 }
 
 // Called when the game starts or when spawned
