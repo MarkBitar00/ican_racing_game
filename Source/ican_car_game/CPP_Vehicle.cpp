@@ -24,13 +24,16 @@ ACPP_Vehicle::ACPP_Vehicle()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
 	SpringArm->TargetArmLength = CameraInitialZoom;
-	SpringArm->TargetOffset = FVector(0, 0, 100);
+	SpringArm->SocketOffset = FVector(0, 0, SpringArmTargetOffset);
 	SpringArm->bInheritPitch = false;
 	SpringArm->bInheritRoll = false;
+	SpringArm->bDoCollisionTest = false;
 
 	// Create Camera and attach it to Spring Arm
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
+	Camera->SetRelativeRotation(FRotator(CameraRotation, 0, 0));
+	Camera->SetFieldOfView(CameraFieldOfView);
 
 	// Create and setup Hover Components
 	HoverFrontLeft = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverFrontLeft"));
