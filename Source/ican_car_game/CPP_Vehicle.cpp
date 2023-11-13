@@ -6,6 +6,10 @@
 // Sets default values
 ACPP_Vehicle::ACPP_Vehicle()
 {
+	// Set Pawn replication
+	SetReplicates(true);
+	SetReplicateMovement(true);
+
  	// Set this Pawn to call Tick() every frame
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
