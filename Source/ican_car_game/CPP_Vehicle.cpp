@@ -31,7 +31,6 @@ ACPP_Vehicle::ACPP_Vehicle()
 	SpringArm->SocketOffset = FVector(0, 0, SpringArmTargetOffset);
 	SpringArm->bInheritPitch = false;
 	SpringArm->bInheritRoll = false;
-	//SpringArm->bDoCollisionTest = false;
 
 	// Create Camera and attach it to Spring Arm
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -143,24 +142,24 @@ void ACPP_Vehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		// Bind Accelerate Input Action handler methods
 		if (ActionAccelerate)
 		{
-			EnhancedInputComponent->BindAction(ActionAccelerate, ETriggerEvent::Triggered, this, &ACPP_Vehicle::HandleAccelerate);
-			EnhancedInputComponent->BindAction(ActionAccelerate, ETriggerEvent::Started, this, &ACPP_Vehicle::HandleStartAccelerate);
-			EnhancedInputComponent->BindAction(ActionAccelerate, ETriggerEvent::Completed, this, &ACPP_Vehicle::HandleStopAccelerate);
+			EnhancedInputComponent->BindAction(ActionAccelerate, ETriggerEvent::Triggered, this, &ACPP_Vehicle::Accelerate);
+			EnhancedInputComponent->BindAction(ActionAccelerate, ETriggerEvent::Started, this, &ACPP_Vehicle::StartAccelerate);
+			EnhancedInputComponent->BindAction(ActionAccelerate, ETriggerEvent::Completed, this, &ACPP_Vehicle::StopAccelerate);
 		}
 
 		// Bind Brake Input Action handler methods
 		if (ActionBrake)
 		{
-			EnhancedInputComponent->BindAction(ActionBrake, ETriggerEvent::Started, this, &ACPP_Vehicle::HandleStartBrake);
-			EnhancedInputComponent->BindAction(ActionBrake, ETriggerEvent::Completed, this, &ACPP_Vehicle::HandleStopBrake);
+			EnhancedInputComponent->BindAction(ActionBrake, ETriggerEvent::Started, this, &ACPP_Vehicle::StartBrake);
+			EnhancedInputComponent->BindAction(ActionBrake, ETriggerEvent::Completed, this, &ACPP_Vehicle::StopBrake);
 		}
 
 		// Bind Steer Input Action handler methods
 		if (ActionSteer)
 		{
-			EnhancedInputComponent->BindAction(ActionSteer, ETriggerEvent::Triggered, this, &ACPP_Vehicle::HandleSteer);
-			EnhancedInputComponent->BindAction(ActionSteer, ETriggerEvent::Canceled, this, &ACPP_Vehicle::HandleStopSteer);
-			EnhancedInputComponent->BindAction(ActionSteer, ETriggerEvent::Completed, this, &ACPP_Vehicle::HandleStopSteer);
+			EnhancedInputComponent->BindAction(ActionSteer, ETriggerEvent::Triggered, this, &ACPP_Vehicle::Steer);
+			EnhancedInputComponent->BindAction(ActionSteer, ETriggerEvent::Canceled, this, &ACPP_Vehicle::StopSteer);
+			EnhancedInputComponent->BindAction(ActionSteer, ETriggerEvent::Completed, this, &ACPP_Vehicle::StopSteer);
 		}
 
 		// Bind Toggle Polarity Input Action handler method
@@ -260,20 +259,25 @@ void ACPP_Vehicle::SetMagnetInRange(ACPP_Magnet* Magnet)
 
 // Input Action handlers
 // Accelerate Input Action handlers
-void ACPP_Vehicle::HandleAccelerate(const struct FInputActionValue& Value)
+void ACPP_Vehicle::Accelerate(const struct FInputActionValue& Value)
 {
 	const float AccelerationValue = Value.Get<float>();
 	FVector ForwardVector = Mesh->GetForwardVector();
 
-	Mesh->AddForce(ForwardVector * AccelerationSpeed * AccelerationValue, NAME_None, true);
+	HandleAccelerate(AccelerationValue, ForwardVector);
 }
 
-void ACPP_Vehicle::HandleStartAccelerate()
+void ACPP_Vehicle::HandleAccelerate_Implementation(float Acceleration, FVector Forward)
+{
+	Mesh->AddForce(Forward * AccelerationSpeed * Acceleration, NAME_None, true);
+}
+
+void ACPP_Vehicle::StartAccelerate()
 {
 	CameraCurrentZoom = MaxCameraZoom;
 }
 
-void ACPP_Vehicle::HandleStopAccelerate(const struct FInputActionInstance& Instance)
+void ACPP_Vehicle::StopAccelerate(const struct FInputActionInstance& Instance)
 {
 	const float AccelerationDuration = Instance.GetTriggeredTime();
 	float DecelerationTimelinePlayRate = 1 / FMath::Clamp(AccelerationDuration, 0, MaxDecelerationDuration);
@@ -284,7 +288,7 @@ void ACPP_Vehicle::HandleStopAccelerate(const struct FInputActionInstance& Insta
 }
 
 // Brake Input Action handlers
-void ACPP_Vehicle::HandleStartBrake()
+void ACPP_Vehicle::StartBrake()
 {
 	AccelerationSpeed = 0;
 	CameraCurrentZoom = CameraInitialZoom;
@@ -292,20 +296,19 @@ void ACPP_Vehicle::HandleStartBrake()
 	TimelineDeceleration->Stop();
 }
 
-void ACPP_Vehicle::HandleStopBrake()
+void ACPP_Vehicle::StopBrake()
 {
 	AccelerationSpeed = InitialAccelerationSpeed;
 }
 
 // Steer Input Action handlers
-void ACPP_Vehicle::HandleSteer(const struct FInputActionValue& Value)
+void ACPP_Vehicle::Steer(const struct FInputActionValue& Value)
 {
 	const float SteerValue = Value.Get<float>();
 
 	if (SteerValue < 0.1 && SteerValue > -0.1) return;
 
 	CameraCurrentOffset = SteerValue > 0 ? MaxCameraOffset : -MaxCameraOffset;
-	Mesh->AddTorqueInDegrees(FVector(0, 0, SteerValue * SteeringSpeed), NAME_None, true);
 
 	FVector RightVector = Mesh->GetRightVector();
 	FVector LeftLocation = SteerLeftLocation->GetComponentLocation();
@@ -313,10 +316,16 @@ void ACPP_Vehicle::HandleSteer(const struct FInputActionValue& Value)
 	FVector Force = RightVector * SteeringRotationForce * (SteerValue > 0 ? 1 : -1);
 	FVector Location = SteerValue > 0 ? RightLocation : LeftLocation;
 
+	HandleSteer(SteerValue, Force, Location);
+}
+
+void ACPP_Vehicle::HandleSteer_Implementation(float Steer, FVector Force, FVector Location)
+{
+	Mesh->AddTorqueInDegrees(FVector(0, 0, Steer * SteeringSpeed), NAME_None, true);
 	Mesh->AddForceAtLocation(Force, Location);
 }
 
-void ACPP_Vehicle::HandleStopSteer()
+void ACPP_Vehicle::StopSteer()
 {
 	CameraCurrentOffset = 0;
 }

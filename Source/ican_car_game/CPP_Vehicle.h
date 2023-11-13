@@ -149,22 +149,25 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
 	class UInputAction* ActionTogglePolarity;
 
-	// Input handler methods
-	// Accelerate handler methods
-	void HandleAccelerate(const struct FInputActionValue& Value);
-	void HandleStartAccelerate();
-	void HandleStopAccelerate(const struct FInputActionInstance& Instance);
+	// Input Actions handler methods
+	void Accelerate(const struct FInputActionValue& Value);
+	void StartAccelerate();
+	void StopAccelerate(const struct FInputActionInstance& Instance);
 
-	// Steer handler methods
-	void HandleSteer(const struct FInputActionValue& Value);
-	void HandleStopSteer();
+	void Steer(const struct FInputActionValue& Value);
+	void StopSteer();
 
-	// Brake handler methods
-	void HandleStartBrake();
-	void HandleStopBrake();
+	void StartBrake();
+	void StopBrake();
 
-	// Toggle Polarity handler method
 	void HandleTogglePolarity();
+
+	// Input Actions server implementations
+	UFUNCTION(Server, Unreliable)
+	void HandleAccelerate(float Acceleration, FVector Forward);
+
+	UFUNCTION(Server, Unreliable)
+	void HandleSteer(float Steer, FVector Force, FVector Location);
 
 	// Attributes (Camera)
 	UPROPERTY(BlueprintReadonly, Category = "Camera")
