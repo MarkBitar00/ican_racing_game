@@ -1,5 +1,7 @@
 #include "CPP_Vehicle.h"
 #include "CPP_Magnet.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 
 // Sets default values
 ACPP_Vehicle::ACPP_Vehicle()
@@ -74,6 +76,15 @@ void ACPP_Vehicle::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Add Input Mapping Context
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+
 	// Set initial attribute values
 	InitialAccelerationSpeed = AccelerationSpeed;
 	CameraCurrentZoom = CameraInitialZoom;
@@ -118,6 +129,37 @@ void ACPP_Vehicle::Tick(float DeltaTime)
 void ACPP_Vehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	// Set up Input Action bindings
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		// Bind Accelerate Input Action handler methods
+		if (ActionAccelerate)
+		{
+			EnhancedInputComponent->BindAction(ActionAccelerate, ETriggerEvent::Triggered, this, &ACPP_Vehicle::HandleAccelerate);
+			EnhancedInputComponent->BindAction(ActionAccelerate, ETriggerEvent::Started, this, &ACPP_Vehicle::HandleStartAccelerate);
+			EnhancedInputComponent->BindAction(ActionAccelerate, ETriggerEvent::Completed, this, &ACPP_Vehicle::HandleStopAccelerate);
+		}
+
+		// Bind Brake Input Action handler methods
+		if (ActionBrake)
+		{
+			EnhancedInputComponent->BindAction(ActionBrake, ETriggerEvent::Started, this, &ACPP_Vehicle::HandleStartBrake);
+			EnhancedInputComponent->BindAction(ActionBrake, ETriggerEvent::Completed, this, &ACPP_Vehicle::HandleStopBrake);
+		}
+
+		// Bind Steer Input Action handler methods
+		if (ActionSteer)
+		{
+			EnhancedInputComponent->BindAction(ActionSteer, ETriggerEvent::Triggered, this, &ACPP_Vehicle::HandleSteer);
+			EnhancedInputComponent->BindAction(ActionSteer, ETriggerEvent::Canceled, this, &ACPP_Vehicle::HandleStopSteer);
+			EnhancedInputComponent->BindAction(ActionSteer, ETriggerEvent::Completed, this, &ACPP_Vehicle::HandleStopSteer);
+		}
+
+		// Bind Toggle Polarity Input Action handler method
+		if (ActionTogglePolarity)
+			EnhancedInputComponent->BindAction(ActionTogglePolarity, ETriggerEvent::Started, this, &ACPP_Vehicle::HandleTogglePolarity);
+	}
 }
 
 // Called during the Deceleration Timeline's update event
@@ -207,4 +249,108 @@ void ACPP_Vehicle::SetMagneticPolarity(EMagneticPolarity Polarity)
 void ACPP_Vehicle::SetMagnetInRange(ACPP_Magnet* Magnet)
 {
 	MagnetInRange = Magnet;
+}
+
+// Input Action handlers
+// Accelerate Input Action handlers
+void ACPP_Vehicle::HandleAccelerate(const struct FInputActionValue& Value)
+{
+	const float AccelerationValue = Value.Get<float>();
+	FVector ForwardVector = Mesh->GetForwardVector();
+
+	Mesh->AddForce(ForwardVector * AccelerationSpeed * AccelerationValue, NAME_None, true);
+}
+
+void ACPP_Vehicle::HandleStartAccelerate()
+{
+	CameraCurrentZoom = MaxCameraZoom;
+}
+
+void ACPP_Vehicle::HandleStopAccelerate(const struct FInputActionInstance& Instance)
+{
+	const float AccelerationDuration = Instance.GetTriggeredTime();
+	float DecelerationTimelinePlayRate = 1 / FMath::Clamp(AccelerationDuration, 0, MaxDecelerationDuration);
+
+	CameraCurrentZoom = CameraInitialZoom;
+	TimelineDeceleration->SetPlayRate(DecelerationTimelinePlayRate);
+	TimelineDeceleration->PlayFromStart();
+}
+
+// Brake Input Action handlers
+void ACPP_Vehicle::HandleStartBrake()
+{
+	AccelerationSpeed = 0;
+	CameraCurrentZoom = CameraInitialZoom;
+	CameraCurrentOffset = 0;
+	TimelineDeceleration->Stop();
+}
+
+void ACPP_Vehicle::HandleStopBrake()
+{
+	AccelerationSpeed = InitialAccelerationSpeed;
+}
+
+// Steer Input Action handlers
+void ACPP_Vehicle::HandleSteer(const struct FInputActionValue& Value)
+{
+	const float SteerValue = Value.Get<float>();
+
+	if (SteerValue < 0.1 && SteerValue > -0.1) return;
+
+	CameraCurrentOffset = SteerValue > 0 ? MaxCameraOffset : -MaxCameraOffset;
+	Mesh->AddTorqueInDegrees(FVector(0, 0, SteerValue * SteeringSpeed), NAME_None, true);
+
+	FVector RightVector = Mesh->GetRightVector();
+	FVector LeftLocation = SteerLeftLocation->GetComponentLocation();
+	FVector RightLocation = SteerRightLocation->GetComponentLocation();
+	FVector Force = RightVector * SteeringRotationForce * (SteerValue > 0 ? 1 : -1);
+	FVector Location = SteerValue > 0 ? RightLocation : LeftLocation;
+
+	Mesh->AddForceAtLocation(Force, Location);
+}
+
+void ACPP_Vehicle::HandleStopSteer()
+{
+	CameraCurrentOffset = 0;
+}
+
+// Toggle Polarity Input Action handler
+void ACPP_Vehicle::HandleTogglePolarity()
+{
+	if (!bCanSwitchPolarity) return;
+
+	EMagneticPolarity NewPolarity = MagneticPolarity == EMagneticPolarity::POSITIVE ? EMagneticPolarity::NEGATIVE : EMagneticPolarity::POSITIVE;
+
+	MagneticPolarity = NewPolarity;
+	Mesh->SetMaterial(0, NewPolarity == EMagneticPolarity::POSITIVE ? MaterialPositive : MaterialNegative);
+
+	bCanSwitchPolarity = false;
+	GetWorld()->GetTimerManager().SetTimer(PolarityTimerHandle, this, &ACPP_Vehicle::OnPolarityTimerEnd, 1, false, PolarityDelay);
+
+	if (MagnetInRange == nullptr) return;
+	if (MagnetInRange->GetMagneticPolarity() == NewPolarity)
+	{
+		float CurveFloatValue = CurveBoost->GetFloatValue(GetCurveBoostDuration());
+
+		AccelerationSpeed *= CurveFloatValue;
+		CameraCurrentZoom = CameraCurrentZoom * CurveFloatValue;
+
+		GetWorld()->GetTimerManager().SetTimer(BoostTimerHandle, this, &ACPP_Vehicle::OnBoostTimerEnd, 1, false, CurveFloatValue);
+	}
+	else
+	{
+		AccelerationSpeed = InitialAccelerationSpeed;
+	}
+}
+
+void ACPP_Vehicle::OnPolarityTimerEnd()
+{
+	bCanSwitchPolarity = true;
+}
+
+// Reset Acceleration Speed and Spring Arm Length when boost ends
+void ACPP_Vehicle::OnBoostTimerEnd()
+{
+	AccelerationSpeed = InitialAccelerationSpeed;
+	CameraCurrentZoom = MaxCameraZoom;
 }

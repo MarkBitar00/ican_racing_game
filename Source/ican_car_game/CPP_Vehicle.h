@@ -7,6 +7,7 @@
 #include "Components/TimelineComponent.h"
 #include "CPP_HoverComponent.h"
 #include "CPP_E_MagneticPolarity.h"
+#include "InputActionValue.h"
 #include "CPP_Vehicle.generated.h"
 
 class ACPP_Magnet;
@@ -132,6 +133,39 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
 	USceneComponent* SteerRightLocation;
 
+	// Input components
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	class UInputMappingContext* DefaultMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	class UInputAction* ActionAccelerate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	class UInputAction* ActionSteer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	class UInputAction* ActionBrake;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	class UInputAction* ActionTogglePolarity;
+
+	// Input handler methods
+	// Accelerate handler methods
+	void HandleAccelerate(const struct FInputActionValue& Value);
+	void HandleStartAccelerate();
+	void HandleStopAccelerate(const struct FInputActionInstance& Instance);
+
+	// Steer handler methods
+	void HandleSteer(const struct FInputActionValue& Value);
+	void HandleStopSteer();
+
+	// Brake handler methods
+	void HandleStartBrake();
+	void HandleStopBrake();
+
+	// Toggle Polarity handler method
+	void HandleTogglePolarity();
+
 	// Attributes (Camera)
 	UPROPERTY(BlueprintReadonly, Category = "Camera")
 	float CameraCurrentZoom = 0;
@@ -162,7 +196,7 @@ protected:
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	ACPP_Magnet* MagnetInRange = nullptr;
 
-	// Timeline Components
+	// Timeline components
 	UPROPERTY()
 	UTimelineComponent* TimelineDeceleration = nullptr;
 
@@ -170,6 +204,12 @@ protected:
 	UCurveFloat* CurveTimeline = nullptr;
 
 	FOnTimelineFloat TimelineUpdate{};
+
+	// Timer components
+	FTimerHandle PolarityTimerHandle;
+	FTimerHandle BoostTimerHandle;
+	void OnPolarityTimerEnd();
+	void OnBoostTimerEnd();
 
 public:
 	// Public attributes (Camera)
