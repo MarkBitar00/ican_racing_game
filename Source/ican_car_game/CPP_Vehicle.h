@@ -7,6 +7,7 @@
 #include "Components/TimelineComponent.h"
 #include "CPP_HoverComponent.h"
 #include "CPP_E_MagneticPolarity.h"
+#include "InputActionValue.h"
 #include "CPP_Vehicle.generated.h"
 
 class ACPP_Magnet;
@@ -104,6 +105,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Replicate properties
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	// Pawn components
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category="Components")
 	UStaticMeshComponent* Mesh;
@@ -132,6 +136,42 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
 	USceneComponent* SteerRightLocation;
 
+	// Input components
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	class UInputMappingContext* DefaultMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	class UInputAction* ActionAccelerate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	class UInputAction* ActionSteer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	class UInputAction* ActionBrake;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	class UInputAction* ActionTogglePolarity;
+
+	// Input Actions handler methods
+	void Accelerate(const struct FInputActionValue& Value);
+	void StartAccelerate();
+	void StopAccelerate(const struct FInputActionInstance& Instance);
+
+	void Steer(const struct FInputActionValue& Value);
+	void StopSteer();
+
+	void StartBrake();
+	void StopBrake();
+
+	void HandleTogglePolarity();
+
+	// Input Actions server implementations
+	UFUNCTION(Server, Unreliable)
+	void HandleAccelerate(float Acceleration, FVector Forward);
+
+	UFUNCTION(Server, Unreliable)
+	void HandleSteer(float Steer, FVector Force, FVector Location);
+
 	// Attributes (Camera)
 	UPROPERTY(BlueprintReadonly, Category = "Camera")
 	float CameraCurrentZoom = 0;
@@ -147,7 +187,7 @@ protected:
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	bool bCanSwitchPolarity = true;
 
-	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
+	UPROPERTY(BlueprintReadonly, Category = "Magnetism", Replicated)
 	EMagneticPolarity MagneticPolarity = EMagneticPolarity::POSITIVE;
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
@@ -162,7 +202,7 @@ protected:
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	ACPP_Magnet* MagnetInRange = nullptr;
 
-	// Timeline Components
+	// Timeline components
 	UPROPERTY()
 	UTimelineComponent* TimelineDeceleration = nullptr;
 
@@ -170,6 +210,12 @@ protected:
 	UCurveFloat* CurveTimeline = nullptr;
 
 	FOnTimelineFloat TimelineUpdate{};
+
+	// Timer components
+	FTimerHandle PolarityTimerHandle;
+	FTimerHandle BoostTimerHandle;
+	void OnPolarityTimerEnd();
+	void OnBoostTimerEnd();
 
 public:
 	// Public attributes (Camera)
@@ -184,6 +230,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
 	float CameraInterpolationSpeed = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
+	float SpringArmTargetOffset = 300;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
+	float CameraRotation = -30;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
+	float CameraFieldOfView = 135;
 
 	// Public attributes (Movement)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
