@@ -105,6 +105,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Replicate properties
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	// Pawn components
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category="Components")
 	UStaticMeshComponent* Mesh;
@@ -184,7 +187,7 @@ protected:
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	bool bCanSwitchPolarity = true;
 
-	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
+	UPROPERTY(BlueprintReadonly, Category = "Magnetism", Replicated)
 	EMagneticPolarity MagneticPolarity = EMagneticPolarity::POSITIVE;
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
