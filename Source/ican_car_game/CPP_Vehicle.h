@@ -232,10 +232,10 @@ public:
 	float CameraInterpolationSpeed = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
-	float SpringArmTargetOffset = 300;
+	float SpringArmTargetOffset = 200;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
-	float CameraRotation = -30;
+	float CameraRotation = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
 	float CameraFieldOfView = 135;
