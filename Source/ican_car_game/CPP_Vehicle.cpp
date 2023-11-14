@@ -1,5 +1,6 @@
 #include "CPP_Vehicle.h"
 #include "CPP_Magnet.h"
+#include "Net/UnrealNetwork.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
@@ -75,6 +76,14 @@ ACPP_Vehicle::ACPP_Vehicle()
 
 	// Add tag for Magnet overlaps
 	this->Tags.Add(FName("HoverVehicle"));
+}
+
+// Replicate Pawn properties
+void ACPP_Vehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACPP_Vehicle, MagneticPolarity);
 }
 
 // Called when the game starts or when spawned
