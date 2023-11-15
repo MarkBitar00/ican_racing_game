@@ -237,6 +237,9 @@ public:
 	float MaxCameraZoom = 600;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
+	float MaxBoostCameraZoom = 800;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
 	float MaxCameraOffset = 120;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
@@ -254,6 +257,9 @@ public:
 	// Public attributes (Movement)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
 	float AccelerationSpeed = 12000;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
+	float MaxBoostAccelerationSpeed = 24000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
 	float SteeringSpeed = 500;

@@ -358,9 +358,11 @@ void ACPP_Vehicle::HandleTogglePolarity()
 	if (MagnetInRange->GetMagneticPolarity() == NewPolarity)
 	{
 		float CurveFloatValue = CurveBoost->GetFloatValue(GetCurveBoostDuration());
+		float NewAccelerationSpeed = AccelerationSpeed * CurveFloatValue;
+		float NewCameraZoom = CameraCurrentZoom * CurveFloatValue;
 
-		AccelerationSpeed *= CurveFloatValue;
-		CameraCurrentZoom = CameraCurrentZoom * CurveFloatValue;
+		AccelerationSpeed = NewAccelerationSpeed > MaxBoostAccelerationSpeed ? MaxBoostAccelerationSpeed : NewAccelerationSpeed;
+		CameraCurrentZoom = NewCameraZoom > MaxBoostCameraZoom ? MaxBoostCameraZoom : NewCameraZoom;
 
 		GetWorld()->GetTimerManager().SetTimer(BoostTimerHandle, this, &ACPP_Vehicle::OnBoostTimerEnd, 1, false, CurveFloatValue);
 	}
