@@ -54,13 +54,16 @@ ACPP_Vehicle::ACPP_Vehicle()
 	SteerRightLocation->SetupAttachment(RootComponent);
 
 	// Create Curves and set default
+	CurveAcceleration = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveAcceleration"));
 	CurveAttraction = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveAttraction"));
 	CurveRepulsion = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveRepulsion"));
 	CurveBoost = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoost"));
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>
+		CurveAccelerationFile(TEXT("/Game/Utils/Curves/AccelerationCurve")),
 		CurveAttractionFile(TEXT("/Game/Utils/Curves/AttractionCurve")),
 		CurveRepulsionFile(TEXT("/Game/Utils/Curves/RepulsionCurve")),
 		CurveBoostFile(TEXT("/Game/Utils/Curves/BoostCurve"));
+	CurveAcceleration = CurveAccelerationFile.Object;
 	CurveAttraction = CurveAttractionFile.Object;
 	CurveRepulsion = CurveRepulsionFile.Object;
 	CurveBoost = CurveBoostFile.Object;
@@ -266,9 +269,9 @@ void ACPP_Vehicle::SetMagnetInRange(ACPP_Magnet* Magnet)
 
 // Input Action handlers
 // Accelerate Input Action handlers
-void ACPP_Vehicle::Accelerate(const struct FInputActionValue& Value)
+void ACPP_Vehicle::Accelerate(const struct FInputActionInstance& Instance)
 {
-	const float AccelerationValue = Value.Get<float>();
+	const float AccelerationValue = CurveAcceleration->GetFloatValue(Instance.GetElapsedTime()) * Instance.GetValue().Get<float>();
 	FVector ForwardVector = Mesh->GetForwardVector();
 
 	HandleAccelerate(AccelerationValue, ForwardVector);

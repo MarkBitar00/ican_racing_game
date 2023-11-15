@@ -162,7 +162,7 @@ protected:
 	class UInputAction* ActionRestart;
 
 	// Input Actions handler methods
-	void Accelerate(const struct FInputActionValue& Value);
+	void Accelerate(const struct FInputActionInstance& Instance);
 	void StartAccelerate();
 	void StopAccelerate(const struct FInputActionInstance& Instance);
 
@@ -193,6 +193,9 @@ protected:
 	// Attributes (Movement)
 	UPROPERTY(BlueprintReadonly, Category = "Movement")
 	float InitialAccelerationSpeed = 12000;
+
+	UPROPERTY(BlueprintReadonly, Category = "Movement")
+	UCurveFloat* CurveAcceleration = nullptr;
 
 	UPROPERTY(BlueprintReadonly, Category = "Movement")
 	FVector InitialPosition = FVector(0, 0, 0);
