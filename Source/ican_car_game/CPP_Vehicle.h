@@ -27,8 +27,17 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	// Events
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartDeceleration(float PlayRate);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void StopDeceleration();
+
 	// Functions
+	UFUNCTION(BlueprintCallable)
 	void TimelineDecelerationUpdate(float Alpha);
+
 	void UpdateCenterOfMass();
 	float GetCurveBoostDuration();
 
@@ -52,9 +61,6 @@ public:
 	// Getter functions (Materials)
 	FORCEINLINE class UMaterialInstance* GetMaterialPositive() const { return MaterialPositive; }
 	FORCEINLINE class UMaterialInstance* GetMaterialNegative() const { return MaterialNegative; }
-
-	// Getter functions (Timelines)
-	FORCEINLINE class UTimelineComponent* GetDecelerationTimeline() const { return TimelineDeceleration; }
 
 	// Getter functions (Camera)
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Camera")
@@ -189,7 +195,7 @@ protected:
 	float InitialAccelerationSpeed = 12000;
 
 	UPROPERTY(BlueprintReadonly, Category = "Movement")
-	FVector InitialPosition = FVector(0,0,0);
+	FVector InitialPosition = FVector(0, 0, 0);
 
 	UPROPERTY(BlueprintReadonly, Category = "Movement")
 	FRotator InitialRotation = FRotator();
@@ -212,15 +218,6 @@ protected:
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	ACPP_Magnet* MagnetInRange = nullptr;
-
-	// Timeline components
-	UPROPERTY()
-	UTimelineComponent* TimelineDeceleration = nullptr;
-
-	UPROPERTY()
-	UCurveFloat* CurveTimeline = nullptr;
-
-	FOnTimelineFloat TimelineUpdate{};
 
 	// Timer components
 	FTimerHandle PolarityTimerHandle;
@@ -249,7 +246,7 @@ public:
 	float CameraRotation = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
-	float CameraFieldOfView = 135;
+	float CameraFieldOfView = 100;
 
 	// Public attributes (Movement)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")

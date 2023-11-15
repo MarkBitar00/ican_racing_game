@@ -75,24 +75,24 @@ void ACPP_VehiclePlayerController::HandleStartAccelerate()
 
 void ACPP_VehiclePlayerController::HandleStopAccelerate(const FInputActionInstance& InputActionInstance)
 {
-	const float AccelerationDuration = InputActionInstance.GetTriggeredTime();
+	/*const float AccelerationDuration = InputActionInstance.GetTriggeredTime();
 	float DecelerationTimelinePlayRate = 1 / FMath::Clamp(AccelerationDuration, 0, PlayerCharacter->MaxDecelerationDuration);
 	UTimelineComponent* DecelerationTimeline = PlayerCharacter->GetDecelerationTimeline();
 
 	PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->CameraInitialZoom);
 	DecelerationTimeline->SetPlayRate(DecelerationTimelinePlayRate);
-	DecelerationTimeline->PlayFromStart();
+	DecelerationTimeline->PlayFromStart();*/
 }
 
 // Brake Input Action handlers
 void ACPP_VehiclePlayerController::HandleStartBrake()
 {
-	UTimelineComponent* DecelerationTimeline = PlayerCharacter->GetDecelerationTimeline();
+	//UTimelineComponent* DecelerationTimeline = PlayerCharacter->GetDecelerationTimeline();
 
 	PlayerCharacter->AccelerationSpeed = 0;
 	PlayerCharacter->SetCameraCurrentZoom(PlayerCharacter->CameraInitialZoom);
 	PlayerCharacter->SetCameraCurrentOffset(0);
-	DecelerationTimeline->Stop();
+	//DecelerationTimeline->Stop();
 }
 
 void ACPP_VehiclePlayerController::HandleStopBrake()
