@@ -29,15 +29,12 @@ ACPP_Vehicle::ACPP_Vehicle()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
 	SpringArm->TargetArmLength = CameraInitialZoom;
-	SpringArm->SocketOffset = FVector(0, 0, SpringArmTargetOffset);
 	SpringArm->bInheritPitch = false;
 	SpringArm->bInheritRoll = false;
 
 	// Create Camera and attach it to Spring Arm
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
-	Camera->SetRelativeRotation(FRotator(CameraRotation, 0, 0));
-	Camera->SetFieldOfView(CameraFieldOfView);
 
 	// Create and setup Hover Components
 	HoverFrontLeft = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverFrontLeft"));
@@ -59,20 +56,13 @@ ACPP_Vehicle::ACPP_Vehicle()
 	CurveAttraction = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveAttraction"));
 	CurveRepulsion = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveRepulsion"));
 	CurveBoost = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoost"));
-	CurveTimeline = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveTimeline"));
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>
 		CurveAttractionFile(TEXT("/Game/Utils/Curves/AttractionCurve")),
 		CurveRepulsionFile(TEXT("/Game/Utils/Curves/RepulsionCurve")),
-		CurveBoostFile(TEXT("/Game/Utils/Curves/BoostCurve")),
-		CurveTimelineFile(TEXT("/Game/Utils/Curves/TimelineFloatDescCurve"));
+		CurveBoostFile(TEXT("/Game/Utils/Curves/BoostCurve"));
 	CurveAttraction = CurveAttractionFile.Object;
 	CurveRepulsion = CurveRepulsionFile.Object;
 	CurveBoost = CurveBoostFile.Object;
-	CurveTimeline = CurveTimelineFile.Object;
-
-	// Create Timeline and bind function to it
-	TimelineDeceleration = CreateDefaultSubobject<UTimelineComponent>(TEXT("TimelineDeceleration"));
-	TimelineUpdate.BindUFunction(this, FName{ TEXT("TimelineDecelerationUpdate") });
 
 	// Add tag for Magnet overlaps
 	this->Tags.Add(FName("HoverVehicle"));
@@ -107,6 +97,11 @@ void ACPP_Vehicle::BeginPlay()
 	InitialPosition = GetActorLocation();
 	InitialRotation = GetActorRotation();
 
+	// Setup Camera properties
+	SpringArm->SocketOffset = FVector(0, 0, SpringArmTargetOffset);
+	Camera->SetRelativeRotation(FRotator(CameraRotation, 0, 0));
+	Camera->SetFieldOfView(CameraFieldOfView);
+
 	// Setup Mesh properties
 	Mesh->SetSimulatePhysics(true);
 	Mesh->SetLinearDamping(LinearDamping);
@@ -117,9 +112,6 @@ void ACPP_Vehicle::BeginPlay()
 	HoverFrontRight->Init(Mesh, HoverHeight, HoverForce, GravityForce);
 	HoverBackLeft->Init(Mesh, HoverHeight, HoverForce, GravityForce);
 	HoverBackRight->Init(Mesh, HoverHeight, HoverForce, GravityForce);
-
-	// Bind Timeline functions
-	TimelineDeceleration->AddInterpFloat(CurveTimeline, TimelineUpdate);
 }
 
 // Called every frame
@@ -178,9 +170,7 @@ void ACPP_Vehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 			EnhancedInputComponent->BindAction(ActionTogglePolarity, ETriggerEvent::Started, this, &ACPP_Vehicle::HandleTogglePolarity);
 
 		if (ActionRestart)
-		{
 			EnhancedInputComponent->BindAction(ActionRestart, ETriggerEvent::Started, this, &ACPP_Vehicle::HandleRestart);
-		}
 	}
 }
 
@@ -299,8 +289,8 @@ void ACPP_Vehicle::StopAccelerate(const struct FInputActionInstance& Instance)
 	float DecelerationTimelinePlayRate = 1 / FMath::Clamp(AccelerationDuration, 0, MaxDecelerationDuration);
 
 	CameraCurrentZoom = CameraInitialZoom;
-	TimelineDeceleration->SetPlayRate(DecelerationTimelinePlayRate);
-	TimelineDeceleration->PlayFromStart();
+
+	StartDeceleration(DecelerationTimelinePlayRate);
 }
 
 // Brake Input Action handlers
@@ -309,7 +299,8 @@ void ACPP_Vehicle::StartBrake()
 	AccelerationSpeed = 0;
 	CameraCurrentZoom = CameraInitialZoom;
 	CameraCurrentOffset = 0;
-	TimelineDeceleration->Stop();
+	
+	StopDeceleration();
 }
 
 void ACPP_Vehicle::StopBrake()
