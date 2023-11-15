@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{81cebe78-dcd3-41ee-a005-7bea3d425f18}">
+		<property name="assetPath">
+			<value>enginelp.ogg</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>27.458730158730159</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{fa1c4fc0-5bc0-4e81-b87f-cef6240ab011}</destination>
+		</relationship>
+	</object>
+</objects>

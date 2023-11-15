@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{6c713357-e2c9-489f-bac4-ef1fdd59746c}">
+		<property name="assetPath">
+			<value>ILL_Numbers_3-2-1.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>2.9893877551020407</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{fa1c4fc0-5bc0-4e81-b87f-cef6240ab011}</destination>
+		</relationship>
+	</object>
+</objects>
