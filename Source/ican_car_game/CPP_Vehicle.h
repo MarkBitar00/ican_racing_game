@@ -39,7 +39,7 @@ public:
 	void TimelineDecelerationUpdate(float Alpha);
 
 	void UpdateCenterOfMass();
-	float GetCurveBoostDuration();
+	float GetDistanceToMagnet();
 
 	// Getter functions
 	// Getter functions (Components)
@@ -82,9 +82,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
 	FORCEINLINE class UCurveFloat* GetCurveRepulsion() const { return CurveRepulsion; }
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
-	FORCEINLINE class UCurveFloat* GetCurveBoost() const { return CurveBoost; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
 	FORCEINLINE class ACPP_Magnet* GetMagnetInRange() const { return MagnetInRange; }
@@ -172,7 +169,7 @@ protected:
 	void StartBrake();
 	void StopBrake();
 
-	void HandleTogglePolarity();
+	void TogglePolarity();
 
 	void HandleRestart();
 
@@ -182,6 +179,9 @@ protected:
 
 	UFUNCTION(Server, Unreliable)
 	void HandleSteer(float Steer, FVector Force, FVector Location);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void HandleTogglePolarity();
 
 	// Attributes (Camera)
 	UPROPERTY(BlueprintReadonly, Category = "Camera")
@@ -217,7 +217,10 @@ protected:
 	UCurveFloat* CurveRepulsion = nullptr;
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
-	UCurveFloat* CurveBoost = nullptr;
+	UCurveFloat* CurveBoostMultiplier = nullptr;
+
+	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
+	UCurveFloat* CurveBoostDuration = nullptr;
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	ACPP_Magnet* MagnetInRange = nullptr;

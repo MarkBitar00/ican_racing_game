@@ -27,7 +27,7 @@ void UCPP_SteamGameInstance::OnCreateSessionComplete(FName SessionName, bool Suc
 {
 	if (Succeeded)
 	{
-		GetWorld()->ServerTravel("/Game/Levels/level_Quentin_test?listen");
+		GetWorld()->ServerTravel("/Game/Levels/Nico-landscape_better?listen");
 	}
 }
 

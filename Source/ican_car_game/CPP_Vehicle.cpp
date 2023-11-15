@@ -54,19 +54,22 @@ ACPP_Vehicle::ACPP_Vehicle()
 	SteerRightLocation->SetupAttachment(RootComponent);
 
 	// Create Curves and set default
+	CurveBoostMultiplier = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoostMultiplier"));
+	CurveBoostDuration = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoostDuration"));
 	CurveAcceleration = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveAcceleration"));
 	CurveAttraction = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveAttraction"));
 	CurveRepulsion = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveRepulsion"));
-	CurveBoost = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoost"));
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>
-		CurveAccelerationFile(TEXT("/Game/Utils/Curves/AccelerationCurve")),
-		CurveAttractionFile(TEXT("/Game/Utils/Curves/AttractionCurve")),
-		CurveRepulsionFile(TEXT("/Game/Utils/Curves/RepulsionCurve")),
-		CurveBoostFile(TEXT("/Game/Utils/Curves/BoostCurve"));
+		CurveBoostMultiplierFile(TEXT("/Game/Utils/BoostMultiplierCurve")),
+		CurveBoostDurationFile(TEXT("/Game/Utils/BoostDurationCurve")),
+		CurveAccelerationFile(TEXT("/Game/Utils/AccelerationCurve")),
+		CurveAttractionFile(TEXT("/Game/Utils/AttractionCurve")),
+		CurveRepulsionFile(TEXT("/Game/Utils/RepulsionCurve"));
+	CurveBoostMultiplier = CurveBoostMultiplierFile.Object;
+	CurveBoostDuration = CurveBoostDurationFile.Object;
 	CurveAcceleration = CurveAccelerationFile.Object;
 	CurveAttraction = CurveAttractionFile.Object;
 	CurveRepulsion = CurveRepulsionFile.Object;
-	CurveBoost = CurveBoostFile.Object;
 
 	// Add tag for Magnet overlaps
 	this->Tags.Add(FName("HoverVehicle"));
@@ -171,8 +174,9 @@ void ACPP_Vehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// Bind Toggle Polarity Input Action handler method
 		if (ActionTogglePolarity)
-			EnhancedInputComponent->BindAction(ActionTogglePolarity, ETriggerEvent::Started, this, &ACPP_Vehicle::HandleTogglePolarity);
+			EnhancedInputComponent->BindAction(ActionTogglePolarity, ETriggerEvent::Started, this, &ACPP_Vehicle::TogglePolarity);
 
+		// Bind Reset Pawn Transform Input Action handler method
 		if (ActionRestart)
 			EnhancedInputComponent->BindAction(ActionRestart, ETriggerEvent::Started, this, &ACPP_Vehicle::HandleRestart);
 	}
@@ -206,7 +210,7 @@ void ACPP_Vehicle::UpdateCenterOfMass()
 	}
 }
 
-float ACPP_Vehicle::GetCurveBoostDuration()
+float ACPP_Vehicle::GetDistanceToMagnet()
 {
 	if (MagnetInRange == nullptr) return 0;
 
@@ -342,10 +346,15 @@ void ACPP_Vehicle::StopSteer()
 }
 
 // Toggle Polarity Input Action handler
-void ACPP_Vehicle::HandleTogglePolarity()
+void ACPP_Vehicle::TogglePolarity()
 {
 	if (!bCanSwitchPolarity) return;
 
+	HandleTogglePolarity();
+}
+
+void ACPP_Vehicle::HandleTogglePolarity_Implementation()
+{
 	EMagneticPolarity NewPolarity = MagneticPolarity == EMagneticPolarity::POSITIVE ? EMagneticPolarity::NEGATIVE : EMagneticPolarity::POSITIVE;
 
 	MagneticPolarity = NewPolarity;
@@ -357,14 +366,16 @@ void ACPP_Vehicle::HandleTogglePolarity()
 	if (MagnetInRange == nullptr) return;
 	if (MagnetInRange->GetMagneticPolarity() == NewPolarity)
 	{
-		float CurveFloatValue = CurveBoost->GetFloatValue(GetCurveBoostDuration());
-		float NewAccelerationSpeed = AccelerationSpeed * CurveFloatValue;
-		float NewCameraZoom = CameraCurrentZoom * CurveFloatValue;
+		float BoostDistance = GetDistanceToMagnet();
+		float BoostMultiplier = CurveBoostMultiplier->GetFloatValue(BoostDistance);
+		float BoostDuration = CurveBoostDuration->GetFloatValue(BoostDistance);
+		float NewAccelerationSpeed = AccelerationSpeed * BoostMultiplier;
+		float NewCameraZoom = CameraCurrentZoom * BoostMultiplier;
 
 		AccelerationSpeed = NewAccelerationSpeed > MaxBoostAccelerationSpeed ? MaxBoostAccelerationSpeed : NewAccelerationSpeed;
 		CameraCurrentZoom = NewCameraZoom > MaxBoostCameraZoom ? MaxBoostCameraZoom : NewCameraZoom;
 
-		GetWorld()->GetTimerManager().SetTimer(BoostTimerHandle, this, &ACPP_Vehicle::OnBoostTimerEnd, 1, false, CurveFloatValue);
+		GetWorld()->GetTimerManager().SetTimer(BoostTimerHandle, this, &ACPP_Vehicle::OnBoostTimerEnd, 1, false, BoostDuration);
 	}
 	else
 	{
@@ -372,6 +383,7 @@ void ACPP_Vehicle::HandleTogglePolarity()
 	}
 }
 
+// Reset Pawn Transform Input Action handler
 void ACPP_Vehicle::HandleRestart() {
 	SetActorLocation(InitialPosition);
 	SetActorRotation(InitialRotation);

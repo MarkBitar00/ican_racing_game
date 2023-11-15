@@ -41,9 +41,9 @@ ACPP_Racer::ACPP_Racer()
 	CurveRepulsion = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveRepulsion"));
 	CurveBoost = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoost"));
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>
-		CurveAttractionFile(TEXT("/Game/Utils/Curves/AttractionCurve")),
-		CurveRepulsionFile(TEXT("/Game/Utils/Curves/RepulsionCurve")),
-		CurveBoostFile(TEXT("/Game/Utils/Curves/BoostCurve"));
+		CurveAttractionFile(TEXT("/Game/Utils/AttractionCurve")),
+		CurveRepulsionFile(TEXT("/Game/Utils/RepulsionCurve")),
+		CurveBoostFile(TEXT("/Game/Utils/BoostMultiplierCurve"));
 	CurveAttraction = CurveAttractionFile.Object;
 	CurveRepulsion = CurveRepulsionFile.Object;
 	CurveBoost = CurveBoostFile.Object;
