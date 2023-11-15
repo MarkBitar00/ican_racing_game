@@ -104,6 +104,8 @@ void ACPP_Vehicle::BeginPlay()
 	InitialAccelerationSpeed = AccelerationSpeed;
 	CameraCurrentZoom = CameraInitialZoom;
 	CameraCurrentOffset = 0;
+	InitialPosition = GetActorLocation();
+	InitialRotation = GetActorRotation();
 
 	// Setup Mesh properties
 	Mesh->SetSimulatePhysics(true);
@@ -174,6 +176,11 @@ void ACPP_Vehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		// Bind Toggle Polarity Input Action handler method
 		if (ActionTogglePolarity)
 			EnhancedInputComponent->BindAction(ActionTogglePolarity, ETriggerEvent::Started, this, &ACPP_Vehicle::HandleTogglePolarity);
+
+		if (ActionRestart)
+		{
+			EnhancedInputComponent->BindAction(ActionRestart, ETriggerEvent::Started, this, &ACPP_Vehicle::HandleRestart);
+		}
 	}
 }
 
@@ -366,6 +373,11 @@ void ACPP_Vehicle::HandleTogglePolarity()
 	{
 		AccelerationSpeed = InitialAccelerationSpeed;
 	}
+}
+
+void ACPP_Vehicle::HandleRestart() {
+	SetActorLocation(InitialPosition);
+	SetActorRotation(InitialRotation);
 }
 
 void ACPP_Vehicle::OnPolarityTimerEnd()

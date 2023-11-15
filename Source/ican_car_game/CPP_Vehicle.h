@@ -152,6 +152,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
 	class UInputAction* ActionTogglePolarity;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	class UInputAction* ActionRestart;
+
 	// Input Actions handler methods
 	void Accelerate(const struct FInputActionValue& Value);
 	void StartAccelerate();
@@ -164,6 +167,8 @@ protected:
 	void StopBrake();
 
 	void HandleTogglePolarity();
+
+	void HandleRestart();
 
 	// Input Actions server implementations
 	UFUNCTION(Server, Unreliable)
@@ -182,6 +187,12 @@ protected:
 	// Attributes (Movement)
 	UPROPERTY(BlueprintReadonly, Category = "Movement")
 	float InitialAccelerationSpeed = 12000;
+
+	UPROPERTY(BlueprintReadonly, Category = "Movement")
+	FVector InitialPosition = FVector(0,0,0);
+
+	UPROPERTY(BlueprintReadonly, Category = "Movement")
+	FRotator InitialRotation = FRotator();
 
 	// Attributes (Magnetism)
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
