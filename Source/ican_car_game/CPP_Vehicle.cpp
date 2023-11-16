@@ -360,7 +360,7 @@ void ACPP_Vehicle::HandleTogglePolarity_Implementation()
 	UMaterialInterface* MatNeg = MaterialNegative != nullptr ? MaterialNegative : MaterialNegativeFallback;
 
 	MagneticPolarity = NewPolarity;
-	Mesh->SetMaterial(0, NewPolarity == EMagneticPolarity::POSITIVE ? MatPos : MatNeg);
+	Mesh->SetMaterial(4, NewPolarity == EMagneticPolarity::POSITIVE ? MatPos : MatNeg);
 
 	bCanSwitchPolarity = false;
 	GetWorld()->GetTimerManager().SetTimer(PolarityTimerHandle, this, &ACPP_Vehicle::OnPolarityTimerEnd, 1, false, PolarityDelay);
