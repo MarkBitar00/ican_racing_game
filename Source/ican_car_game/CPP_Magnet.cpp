@@ -17,11 +17,11 @@ ACPP_Magnet::ACPP_Magnet()
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>
 		MeshFile(TEXT("/Engine/BasicShapes/Cylinder"));
 	Mesh->SetStaticMesh(MeshFile.Object);
-	static ConstructorHelpers::FObjectFinder<UMaterialInstance>
-		MaterialPositiveFile(TEXT("/Game/Materials/MaterialInstances/M_Positive")),
-		MaterialNegativeFile(TEXT("/Game/Materials/MaterialInstances/M_Negative"));
-	MaterialPositive = MaterialPositiveFile.Object;
-	MaterialNegative = MaterialNegativeFile.Object;
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface>
+		MaterialPositiveFallbackFile(TEXT("/Game/Materials/MaterialInstances/M_Positive")),
+		MaterialNegativeFallbackFile(TEXT("/Game/Materials/MaterialInstances/M_Negative"));
+	MaterialPositiveFallback = MaterialPositiveFallbackFile.Object;
+	MaterialNegativeFallback = MaterialNegativeFallbackFile.Object;
 	Mesh->SetRelativeScale3D(FVector(3, 3, 10));
 	Mesh->SetRelativeLocation(FVector(0, 0, 500));
 	Mesh->SetupAttachment(RootComponent);
@@ -32,7 +32,10 @@ void ACPP_Magnet::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 
 	// Set Magnet Material according to its Magnetic Polarity
-	Mesh->SetMaterial(0, MagneticPolarity == EMagneticPolarity::POSITIVE ? MaterialPositive : MaterialNegative);
+	UMaterialInterface* MatPos = MaterialPositive != nullptr ? MaterialPositive : MaterialPositiveFallback;
+	UMaterialInterface* MatNeg = MaterialNegative != nullptr ? MaterialNegative : MaterialNegativeFallback;
+
+	Mesh->SetMaterial(0, MagneticPolarity == EMagneticPolarity::POSITIVE ? MatPos : MatNeg);
 }
 
 // Called when the game starts or when spawned
