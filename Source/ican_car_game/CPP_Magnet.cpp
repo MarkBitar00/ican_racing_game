@@ -64,7 +64,7 @@ void ACPP_Magnet::Tick(float DeltaTime)
 		float LocationsDistance = FVector::Dist(FVector::VectorPlaneProject(VehicleLocation, VectorProjectionPlaneNormal), FVector::VectorPlaneProject(MagnetLocation, VectorProjectionPlaneNormal));
 		float CurveTime = LocationsDistance / ColliderRadius;
 
-		UCurveFloat* Curve = bIsSamePolarity ? Vehicle->GetCurveRepulsion() : Vehicle->GetCurveAttraction();
+		UCurveFloat* Curve = bIsSamePolarity ? Vehicle->GetCurveMagnetRepulsion() : Vehicle->GetCurveMagnetAttraction();
 		float CurveFloatValue = Curve->GetFloatValue(CurveTime);
 
 		FVector Force = (VehicleLocation - MagnetLocation) * (bIsSamePolarity ? MagnetPower : -MagnetPower) * CurveFloatValue;

@@ -26,9 +26,15 @@ ACPP_Vehicle::ACPP_Vehicle()
 	Mesh->SetMaterial(4, MaterialPositiveFallbackFile.Object);
 	Mesh->SetIsReplicated(true);
 
+	// Create Collision Sphere and set radius
+	CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionSphere"));
+	CollisionSphere->SetupAttachment(Mesh);
+	CollisionSphere->InitSphereRadius(ColliderRadius);
+	CollisionSphere->SetHiddenInGame(false);
+
 	// Create Spring Arm and attach it to Root Component
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->SetupAttachment(Mesh);
 	SpringArm->TargetArmLength = CameraInitialZoom;
 	SpringArm->bInheritPitch = false;
 	SpringArm->bInheritRoll = false;
@@ -40,37 +46,43 @@ ACPP_Vehicle::ACPP_Vehicle()
 
 	// Create and setup Hover Components
 	HoverFrontLeft = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverFrontLeft"));
-	HoverFrontLeft->SetupAttachment(RootComponent);
+	HoverFrontLeft->SetupAttachment(Mesh);
 	HoverFrontRight = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverFrontRight"));
-	HoverFrontRight->SetupAttachment(RootComponent);
+	HoverFrontRight->SetupAttachment(Mesh);
 	HoverBackLeft = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverBackLeft"));
-	HoverBackLeft->SetupAttachment(RootComponent);
+	HoverBackLeft->SetupAttachment(Mesh);
 	HoverBackRight = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverBackRight"));
-	HoverBackRight->SetupAttachment(RootComponent);
+	HoverBackRight->SetupAttachment(Mesh);
 
 	// Create and setup Steer locations
 	SteerLeftLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SteerLeftLocation"));
-	SteerLeftLocation->SetupAttachment(RootComponent);
+	SteerLeftLocation->SetupAttachment(Mesh);
 	SteerRightLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SteerRightLocation"));
-	SteerRightLocation->SetupAttachment(RootComponent);
+	SteerRightLocation->SetupAttachment(Mesh);
 
 	// Create Curves and set default
+	CurveAcceleration = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveAcceleration"));
 	CurveBoostMultiplier = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoostMultiplier"));
 	CurveBoostDuration = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoostDuration"));
-	CurveAcceleration = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveAcceleration"));
-	CurveAttraction = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveAttraction"));
-	CurveRepulsion = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveRepulsion"));
+	CurveVehicleAttraction = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveVehicleAttraction"));
+	CurveVehicleRepulsion = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveVehicleRepulsion"));
+	CurveMagnetAttraction = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveMagnetAttraction"));
+	CurveMagnetRepulsion = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveMagnetRepulsion"));
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>
+		CurveAccelerationFile(TEXT("/Game/Utils/AccelerationCurve")),
 		CurveBoostMultiplierFile(TEXT("/Game/Utils/BoostMultiplierCurve")),
 		CurveBoostDurationFile(TEXT("/Game/Utils/BoostDurationCurve")),
-		CurveAccelerationFile(TEXT("/Game/Utils/AccelerationCurve")),
-		CurveAttractionFile(TEXT("/Game/Utils/AttractionCurve")),
-		CurveRepulsionFile(TEXT("/Game/Utils/RepulsionCurve"));
+		CurveVehicleAttractionFile(TEXT("/Game/Utils/VehicleAttractionCurve")),
+		CurveVehicleRepulsionFile(TEXT("/Game/Utils/VehicleRepulsionCurve")),
+		CurveMagnetAttractionFile(TEXT("/Game/Utils/AttractionCurve")),
+		CurveMagnetRepulsionFile(TEXT("/Game/Utils/RepulsionCurve"));
+	CurveAcceleration = CurveAccelerationFile.Object;
 	CurveBoostMultiplier = CurveBoostMultiplierFile.Object;
 	CurveBoostDuration = CurveBoostDurationFile.Object;
-	CurveAcceleration = CurveAccelerationFile.Object;
-	CurveAttraction = CurveAttractionFile.Object;
-	CurveRepulsion = CurveRepulsionFile.Object;
+	CurveVehicleAttraction = CurveVehicleAttractionFile.Object;
+	CurveVehicleRepulsion = CurveVehicleRepulsionFile.Object;
+	CurveMagnetAttraction = CurveMagnetAttractionFile.Object;
+	CurveMagnetRepulsion = CurveMagnetRepulsionFile.Object;
 
 	// Add tag for Magnet overlaps
 	this->Tags.Add(FName("HoverVehicle"));
@@ -81,8 +93,9 @@ void ACPP_Vehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ACPP_Vehicle, MagneticPolarity);
 	DOREPLIFETIME(ACPP_Vehicle, Mesh);
+	DOREPLIFETIME(ACPP_Vehicle, CollisionSphere);
+	DOREPLIFETIME(ACPP_Vehicle, MagneticPolarity);
 }
 
 // Called when the game starts or when spawned
@@ -121,6 +134,10 @@ void ACPP_Vehicle::BeginPlay()
 	HoverFrontRight->Init(Mesh, HoverHeight, HoverForce, GravityForce);
 	HoverBackLeft->Init(Mesh, HoverHeight, HoverForce, GravityForce);
 	HoverBackRight->Init(Mesh, HoverHeight, HoverForce, GravityForce);
+
+	// Bind Collider overlap functions
+	CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &ACPP_Vehicle::OverlapBegin);
+	CollisionSphere->OnComponentEndOverlap.AddDynamic(this, &ACPP_Vehicle::OverlapEnd);
 }
 
 // Called every frame
@@ -141,6 +158,24 @@ void ACPP_Vehicle::Tick(float DeltaTime)
 	CurrentRotation.Roll = FMath::Clamp(CurrentRotation.Roll, -MaxRotation, MaxRotation);
 	CurrentRotation.Pitch = FMath::Clamp(CurrentRotation.Pitch, -MaxRotation, MaxRotation);
 	Mesh->SetWorldRotation(CurrentRotation);
+
+	// Apply magnetic force on players in range
+	for (ACPP_Vehicle* VehicleInRange : PlayersInRange)
+	{
+		UStaticMeshComponent* VehicleInRangeMesh = VehicleInRange->GetMesh();
+		FVector VehicleInRangeLocation = VehicleInRange->GetActorLocation();
+		FVector Location = GetActorLocation();
+		bool bIsSamePolarity = VehicleInRange->GetMagneticPolarity() == MagneticPolarity;
+
+		float LocationsDistance = FVector::Dist(VehicleInRangeLocation, Location);
+		float CurveTime = LocationsDistance / ColliderRadius;
+
+		UCurveFloat* Curve = bIsSamePolarity ? CurveVehicleRepulsion : CurveVehicleAttraction;
+		float CurveFloatValue = Curve->GetFloatValue(CurveTime);
+
+		FVector Force = (VehicleInRangeLocation - Location) * (bIsSamePolarity ? VehicleMagneticPower : -VehicleMagneticPower) * CurveFloatValue;
+		VehicleInRangeMesh->AddForce(Force, NAME_None, true);
+	}
 }
 
 // Called to bind functionality to input
@@ -182,6 +217,23 @@ void ACPP_Vehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		if (ActionRestart)
 			EnhancedInputComponent->BindAction(ActionRestart, ETriggerEvent::Started, this, &ACPP_Vehicle::HandleRestart);
 	}
+}
+
+// Collision Sphere overlap functions
+void ACPP_Vehicle::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!OtherActor->ActorHasTag(FName("HoverVehicle"))) return;
+
+	ACPP_Vehicle* Player = Cast<ACPP_Vehicle>(OtherActor);
+	PlayersInRange.Add(Player);
+}
+
+void ACPP_Vehicle::OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (!OtherActor->ActorHasTag(FName("HoverVehicle"))) return;
+
+	ACPP_Vehicle* Player = Cast<ACPP_Vehicle>(OtherActor);
+	PlayersInRange.Remove(Player);
 }
 
 // Called during the Deceleration Timeline's update event
