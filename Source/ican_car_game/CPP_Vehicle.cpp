@@ -23,7 +23,7 @@ ACPP_Vehicle::ACPP_Vehicle()
 		MaterialNegativeFallbackFile(TEXT("/Game/Materials/MaterialInstances/M_Negative"));
 	MaterialPositiveFallback = MaterialPositiveFallbackFile.Object;
 	MaterialNegativeFallback = MaterialNegativeFallbackFile.Object;
-	Mesh->SetMaterial(0, MaterialPositiveFallbackFile.Object);
+	Mesh->SetMaterial(4, MaterialPositiveFallbackFile.Object);
 
 	// Create Spring Arm and attach it to Root Component
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
