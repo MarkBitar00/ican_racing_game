@@ -160,6 +160,7 @@ void ACPP_Vehicle::Tick(float DeltaTime)
 	Mesh->SetWorldRotation(CurrentRotation);
 
 	// Apply magnetic force on players in range
+	if (!bActivateVehicleMagnetism) return;
 	for (ACPP_Vehicle* VehicleInRange : PlayersInRange)
 	{
 		UStaticMeshComponent* VehicleInRangeMesh = VehicleInRange->GetMesh();

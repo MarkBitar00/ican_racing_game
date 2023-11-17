@@ -316,10 +316,13 @@ public:
 	float PolarityDelay = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
+	bool bActivateVehicleMagnetism = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
 	float ColliderRadius = 800;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
-	float VehicleMagneticPower = 1000;
+	float VehicleMagneticPower = 500;
 
 	// Public attributes (Materials)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Materials")
