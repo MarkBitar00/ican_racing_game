@@ -58,10 +58,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Components")
 	FORCEINLINE class USceneComponent* GetSteerRightComponent() const { return SteerRightLocation; }
 
-	// Getter functions (Materials)
-	FORCEINLINE class UMaterialInstance* GetMaterialPositive() const { return MaterialPositive; }
-	FORCEINLINE class UMaterialInstance* GetMaterialNegative() const { return MaterialNegative; }
-
 	// Getter functions (Camera)
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Camera")
 	float GetCameraCurrentZoom();
@@ -299,8 +295,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
 	float PolarityDelay = 1;
 
+	// Public attributes (Materials)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Materials")
+	UMaterialInterface* MaterialPositive = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Materials")
+	UMaterialInterface* MaterialNegative = nullptr;
+
 private:
 	// Materials
-	UMaterialInstance* MaterialPositive = nullptr;
-	UMaterialInstance* MaterialNegative = nullptr;
+	UMaterialInterface* MaterialPositiveFallback = nullptr;
+	UMaterialInterface* MaterialNegativeFallback = nullptr;
 };

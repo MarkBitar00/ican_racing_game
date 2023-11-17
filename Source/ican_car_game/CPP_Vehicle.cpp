@@ -19,11 +19,11 @@ ACPP_Vehicle::ACPP_Vehicle()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(Mesh);
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance>
-		MaterialPositiveFile(TEXT("/Game/Materials/MaterialInstances/M_Positive")),
-		MaterialNegativeFile(TEXT("/Game/Materials/MaterialInstances/M_Negative"));
-	MaterialPositive = MaterialPositiveFile.Object;
-	MaterialNegative = MaterialNegativeFile.Object;
-	Mesh->SetMaterial(0, MaterialPositiveFile.Object);
+		MaterialPositiveFallbackFile(TEXT("/Game/Materials/MaterialInstances/M_Positive")),
+		MaterialNegativeFallbackFile(TEXT("/Game/Materials/MaterialInstances/M_Negative"));
+	MaterialPositiveFallback = MaterialPositiveFallbackFile.Object;
+	MaterialNegativeFallback = MaterialNegativeFallbackFile.Object;
+	Mesh->SetMaterial(4, MaterialPositiveFallbackFile.Object);
 
 	// Create Spring Arm and attach it to Root Component
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
@@ -356,9 +356,11 @@ void ACPP_Vehicle::TogglePolarity()
 void ACPP_Vehicle::HandleTogglePolarity_Implementation()
 {
 	EMagneticPolarity NewPolarity = MagneticPolarity == EMagneticPolarity::POSITIVE ? EMagneticPolarity::NEGATIVE : EMagneticPolarity::POSITIVE;
+	UMaterialInterface* MatPos = MaterialPositive != nullptr ? MaterialPositive : MaterialPositiveFallback;
+	UMaterialInterface* MatNeg = MaterialNegative != nullptr ? MaterialNegative : MaterialNegativeFallback;
 
 	MagneticPolarity = NewPolarity;
-	Mesh->SetMaterial(0, NewPolarity == EMagneticPolarity::POSITIVE ? MaterialPositive : MaterialNegative);
+	Mesh->SetMaterial(4, NewPolarity == EMagneticPolarity::POSITIVE ? MatPos : MatNeg);
 
 	bCanSwitchPolarity = false;
 	GetWorld()->GetTimerManager().SetTimer(PolarityTimerHandle, this, &ACPP_Vehicle::OnPolarityTimerEnd, 1, false, PolarityDelay);
