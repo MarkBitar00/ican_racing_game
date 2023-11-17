@@ -323,9 +323,13 @@ void ACPP_Vehicle::Steer(const struct FInputActionValue& Value)
 {
 	const float SteerValue = Value.Get<float>();
 
-	if (SteerValue < 0.1 && SteerValue > -0.1) return;
+	if (SteerValue < 0.1 && SteerValue > -0.1)
+	{
+		StopSteer();
+		return;
+	}
 
-	CameraCurrentOffset = SteerValue > 0.1 ? MaxCameraOffset : SteerValue < -0.1 ? -MaxCameraOffset : 0;
+	CameraCurrentOffset = SteerValue > 0 ? MaxCameraOffset : -MaxCameraOffset;
 
 	FVector RightVector = Mesh->GetRightVector();
 	FVector LeftLocation = SteerLeftLocation->GetComponentLocation();
