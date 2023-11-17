@@ -10,8 +10,8 @@ UCPP_HoverComponent::UCPP_HoverComponent()
 	CurveHover = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveHover"));
 	CurveGravity = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveGravity"));
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>
-		CurveHoverFile(TEXT("/Game/Utils/Curves/SuspensionCurve")),
-		CurveGravityFile(TEXT("/Game/Utils/Curves/GravityCurve"));
+		CurveHoverFile(TEXT("/Game/Utils/SuspensionCurve")),
+		CurveGravityFile(TEXT("/Game/Utils/GravityCurve"));
 	CurveHover = CurveHoverFile.Object;
 	CurveGravity = CurveGravityFile.Object;
 }

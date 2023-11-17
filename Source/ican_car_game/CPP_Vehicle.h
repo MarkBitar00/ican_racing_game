@@ -27,10 +27,19 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	// Events
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartDeceleration(float PlayRate);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void StopDeceleration();
+
 	// Functions
+	UFUNCTION(BlueprintCallable)
 	void TimelineDecelerationUpdate(float Alpha);
+
 	void UpdateCenterOfMass();
-	float GetCurveBoostDuration();
+	float GetDistanceToMagnet();
 
 	// Getter functions
 	// Getter functions (Components)
@@ -48,13 +57,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Components")
 	FORCEINLINE class USceneComponent* GetSteerRightComponent() const { return SteerRightLocation; }
-
-	// Getter functions (Materials)
-	FORCEINLINE class UMaterialInstance* GetMaterialPositive() const { return MaterialPositive; }
-	FORCEINLINE class UMaterialInstance* GetMaterialNegative() const { return MaterialNegative; }
-
-	// Getter functions (Timelines)
-	FORCEINLINE class UTimelineComponent* GetDecelerationTimeline() const { return TimelineDeceleration; }
 
 	// Getter functions (Camera)
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Camera")
@@ -76,9 +78,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
 	FORCEINLINE class UCurveFloat* GetCurveRepulsion() const { return CurveRepulsion; }
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
-	FORCEINLINE class UCurveFloat* GetCurveBoost() const { return CurveBoost; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
 	FORCEINLINE class ACPP_Magnet* GetMagnetInRange() const { return MagnetInRange; }
@@ -152,8 +151,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
 	class UInputAction* ActionTogglePolarity;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	class UInputAction* ActionRestart;
+
 	// Input Actions handler methods
-	void Accelerate(const struct FInputActionValue& Value);
+	void Accelerate(const struct FInputActionInstance& Instance);
 	void StartAccelerate();
 	void StopAccelerate(const struct FInputActionInstance& Instance);
 
@@ -163,7 +165,9 @@ protected:
 	void StartBrake();
 	void StopBrake();
 
-	void HandleTogglePolarity();
+	void TogglePolarity();
+
+	void HandleRestart();
 
 	// Input Actions server implementations
 	UFUNCTION(Server, Unreliable)
@@ -171,6 +175,9 @@ protected:
 
 	UFUNCTION(Server, Unreliable)
 	void HandleSteer(float Steer, FVector Force, FVector Location);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void HandleTogglePolarity();
 
 	// Attributes (Camera)
 	UPROPERTY(BlueprintReadonly, Category = "Camera")
@@ -182,6 +189,15 @@ protected:
 	// Attributes (Movement)
 	UPROPERTY(BlueprintReadonly, Category = "Movement")
 	float InitialAccelerationSpeed = 12000;
+
+	UPROPERTY(BlueprintReadonly, Category = "Movement")
+	UCurveFloat* CurveAcceleration = nullptr;
+
+	UPROPERTY(BlueprintReadonly, Category = "Movement")
+	FVector InitialPosition = FVector(0, 0, 0);
+
+	UPROPERTY(BlueprintReadonly, Category = "Movement")
+	FRotator InitialRotation = FRotator();
 
 	// Attributes (Magnetism)
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
@@ -197,19 +213,13 @@ protected:
 	UCurveFloat* CurveRepulsion = nullptr;
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
-	UCurveFloat* CurveBoost = nullptr;
+	UCurveFloat* CurveBoostMultiplier = nullptr;
+
+	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
+	UCurveFloat* CurveBoostDuration = nullptr;
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	ACPP_Magnet* MagnetInRange = nullptr;
-
-	// Timeline components
-	UPROPERTY()
-	UTimelineComponent* TimelineDeceleration = nullptr;
-
-	UPROPERTY()
-	UCurveFloat* CurveTimeline = nullptr;
-
-	FOnTimelineFloat TimelineUpdate{};
 
 	// Timer components
 	FTimerHandle PolarityTimerHandle;
@@ -226,23 +236,29 @@ public:
 	float MaxCameraZoom = 600;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
+	float MaxBoostCameraZoom = 800;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
 	float MaxCameraOffset = 120;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
 	float CameraInterpolationSpeed = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
-	float SpringArmTargetOffset = 300;
+	float SpringArmTargetOffset = 200;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
-	float CameraRotation = -30;
+	float CameraRotation = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
-	float CameraFieldOfView = 135;
+	float CameraFieldOfView = 100;
 
 	// Public attributes (Movement)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
 	float AccelerationSpeed = 12000;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
+	float MaxBoostAccelerationSpeed = 24000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
 	float SteeringSpeed = 500;
@@ -279,8 +295,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
 	float PolarityDelay = 1;
 
+	// Public attributes (Materials)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Materials")
+	UMaterialInterface* MaterialPositive = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Materials")
+	UMaterialInterface* MaterialNegative = nullptr;
+
 private:
 	// Materials
-	UMaterialInstance* MaterialPositive = nullptr;
-	UMaterialInstance* MaterialNegative = nullptr;
+	UMaterialInterface* MaterialPositiveFallback = nullptr;
+	UMaterialInterface* MaterialNegativeFallback = nullptr;
 };

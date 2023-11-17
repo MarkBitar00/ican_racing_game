@@ -19,25 +19,23 @@ ACPP_Vehicle::ACPP_Vehicle()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(Mesh);
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance>
-		MaterialPositiveFile(TEXT("/Game/Materials/MaterialInstances/M_Positive")),
-		MaterialNegativeFile(TEXT("/Game/Materials/MaterialInstances/M_Negative"));
-	MaterialPositive = MaterialPositiveFile.Object;
-	MaterialNegative = MaterialNegativeFile.Object;
-	Mesh->SetMaterial(0, MaterialPositiveFile.Object);
+		MaterialPositiveFallbackFile(TEXT("/Game/Materials/MaterialInstances/M_Positive")),
+		MaterialNegativeFallbackFile(TEXT("/Game/Materials/MaterialInstances/M_Negative"));
+	MaterialPositiveFallback = MaterialPositiveFallbackFile.Object;
+	MaterialNegativeFallback = MaterialNegativeFallbackFile.Object;
+	Mesh->SetMaterial(4, MaterialPositiveFallbackFile.Object);
 
 	// Create Spring Arm and attach it to Root Component
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
 	SpringArm->TargetArmLength = CameraInitialZoom;
-	SpringArm->SocketOffset = FVector(0, 0, SpringArmTargetOffset);
 	SpringArm->bInheritPitch = false;
 	SpringArm->bInheritRoll = false;
+	SpringArm->bDoCollisionTest = false;
 
 	// Create Camera and attach it to Spring Arm
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
-	Camera->SetRelativeRotation(FRotator(CameraRotation, 0, 0));
-	Camera->SetFieldOfView(CameraFieldOfView);
 
 	// Create and setup Hover Components
 	HoverFrontLeft = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverFrontLeft"));
@@ -56,23 +54,22 @@ ACPP_Vehicle::ACPP_Vehicle()
 	SteerRightLocation->SetupAttachment(RootComponent);
 
 	// Create Curves and set default
+	CurveBoostMultiplier = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoostMultiplier"));
+	CurveBoostDuration = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoostDuration"));
+	CurveAcceleration = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveAcceleration"));
 	CurveAttraction = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveAttraction"));
 	CurveRepulsion = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveRepulsion"));
-	CurveBoost = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoost"));
-	CurveTimeline = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveTimeline"));
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>
-		CurveAttractionFile(TEXT("/Game/Utils/Curves/AttractionCurve")),
-		CurveRepulsionFile(TEXT("/Game/Utils/Curves/RepulsionCurve")),
-		CurveBoostFile(TEXT("/Game/Utils/Curves/BoostCurve")),
-		CurveTimelineFile(TEXT("/Game/Utils/Curves/TimelineFloatDescCurve"));
+		CurveBoostMultiplierFile(TEXT("/Game/Utils/BoostMultiplierCurve")),
+		CurveBoostDurationFile(TEXT("/Game/Utils/BoostDurationCurve")),
+		CurveAccelerationFile(TEXT("/Game/Utils/AccelerationCurve")),
+		CurveAttractionFile(TEXT("/Game/Utils/AttractionCurve")),
+		CurveRepulsionFile(TEXT("/Game/Utils/RepulsionCurve"));
+	CurveBoostMultiplier = CurveBoostMultiplierFile.Object;
+	CurveBoostDuration = CurveBoostDurationFile.Object;
+	CurveAcceleration = CurveAccelerationFile.Object;
 	CurveAttraction = CurveAttractionFile.Object;
 	CurveRepulsion = CurveRepulsionFile.Object;
-	CurveBoost = CurveBoostFile.Object;
-	CurveTimeline = CurveTimelineFile.Object;
-
-	// Create Timeline and bind function to it
-	TimelineDeceleration = CreateDefaultSubobject<UTimelineComponent>(TEXT("TimelineDeceleration"));
-	TimelineUpdate.BindUFunction(this, FName{ TEXT("TimelineDecelerationUpdate") });
 
 	// Add tag for Magnet overlaps
 	this->Tags.Add(FName("HoverVehicle"));
@@ -104,6 +101,13 @@ void ACPP_Vehicle::BeginPlay()
 	InitialAccelerationSpeed = AccelerationSpeed;
 	CameraCurrentZoom = CameraInitialZoom;
 	CameraCurrentOffset = 0;
+	InitialPosition = GetActorLocation();
+	InitialRotation = GetActorRotation();
+
+	// Setup Camera properties
+	SpringArm->SocketOffset = FVector(0, 0, SpringArmTargetOffset);
+	Camera->SetRelativeRotation(FRotator(CameraRotation, 0, 0));
+	Camera->SetFieldOfView(CameraFieldOfView);
 
 	// Setup Mesh properties
 	Mesh->SetSimulatePhysics(true);
@@ -115,9 +119,6 @@ void ACPP_Vehicle::BeginPlay()
 	HoverFrontRight->Init(Mesh, HoverHeight, HoverForce, GravityForce);
 	HoverBackLeft->Init(Mesh, HoverHeight, HoverForce, GravityForce);
 	HoverBackRight->Init(Mesh, HoverHeight, HoverForce, GravityForce);
-
-	// Bind Timeline functions
-	TimelineDeceleration->AddInterpFloat(CurveTimeline, TimelineUpdate);
 }
 
 // Called every frame
@@ -173,7 +174,11 @@ void ACPP_Vehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// Bind Toggle Polarity Input Action handler method
 		if (ActionTogglePolarity)
-			EnhancedInputComponent->BindAction(ActionTogglePolarity, ETriggerEvent::Started, this, &ACPP_Vehicle::HandleTogglePolarity);
+			EnhancedInputComponent->BindAction(ActionTogglePolarity, ETriggerEvent::Started, this, &ACPP_Vehicle::TogglePolarity);
+
+		// Bind Reset Pawn Transform Input Action handler method
+		if (ActionRestart)
+			EnhancedInputComponent->BindAction(ActionRestart, ETriggerEvent::Started, this, &ACPP_Vehicle::HandleRestart);
 	}
 }
 
@@ -205,7 +210,7 @@ void ACPP_Vehicle::UpdateCenterOfMass()
 	}
 }
 
-float ACPP_Vehicle::GetCurveBoostDuration()
+float ACPP_Vehicle::GetDistanceToMagnet()
 {
 	if (MagnetInRange == nullptr) return 0;
 
@@ -268,9 +273,9 @@ void ACPP_Vehicle::SetMagnetInRange(ACPP_Magnet* Magnet)
 
 // Input Action handlers
 // Accelerate Input Action handlers
-void ACPP_Vehicle::Accelerate(const struct FInputActionValue& Value)
+void ACPP_Vehicle::Accelerate(const struct FInputActionInstance& Instance)
 {
-	const float AccelerationValue = Value.Get<float>();
+	const float AccelerationValue = CurveAcceleration->GetFloatValue(Instance.GetElapsedTime()) * Instance.GetValue().Get<float>();
 	FVector ForwardVector = Mesh->GetForwardVector();
 
 	HandleAccelerate(AccelerationValue, ForwardVector);
@@ -292,8 +297,8 @@ void ACPP_Vehicle::StopAccelerate(const struct FInputActionInstance& Instance)
 	float DecelerationTimelinePlayRate = 1 / FMath::Clamp(AccelerationDuration, 0, MaxDecelerationDuration);
 
 	CameraCurrentZoom = CameraInitialZoom;
-	TimelineDeceleration->SetPlayRate(DecelerationTimelinePlayRate);
-	TimelineDeceleration->PlayFromStart();
+
+	StartDeceleration(DecelerationTimelinePlayRate);
 }
 
 // Brake Input Action handlers
@@ -302,7 +307,8 @@ void ACPP_Vehicle::StartBrake()
 	AccelerationSpeed = 0;
 	CameraCurrentZoom = CameraInitialZoom;
 	CameraCurrentOffset = 0;
-	TimelineDeceleration->Stop();
+	
+	StopDeceleration();
 }
 
 void ACPP_Vehicle::StopBrake()
@@ -317,7 +323,7 @@ void ACPP_Vehicle::Steer(const struct FInputActionValue& Value)
 
 	if (SteerValue < 0.1 && SteerValue > -0.1) return;
 
-	CameraCurrentOffset = SteerValue > 0 ? MaxCameraOffset : -MaxCameraOffset;
+	CameraCurrentOffset = SteerValue > 0.1 ? MaxCameraOffset : SteerValue < -0.1 ? -MaxCameraOffset : 0;
 
 	FVector RightVector = Mesh->GetRightVector();
 	FVector LeftLocation = SteerLeftLocation->GetComponentLocation();
@@ -340,14 +346,21 @@ void ACPP_Vehicle::StopSteer()
 }
 
 // Toggle Polarity Input Action handler
-void ACPP_Vehicle::HandleTogglePolarity()
+void ACPP_Vehicle::TogglePolarity()
 {
 	if (!bCanSwitchPolarity) return;
 
+	HandleTogglePolarity();
+}
+
+void ACPP_Vehicle::HandleTogglePolarity_Implementation()
+{
 	EMagneticPolarity NewPolarity = MagneticPolarity == EMagneticPolarity::POSITIVE ? EMagneticPolarity::NEGATIVE : EMagneticPolarity::POSITIVE;
+	UMaterialInterface* MatPos = MaterialPositive != nullptr ? MaterialPositive : MaterialPositiveFallback;
+	UMaterialInterface* MatNeg = MaterialNegative != nullptr ? MaterialNegative : MaterialNegativeFallback;
 
 	MagneticPolarity = NewPolarity;
-	Mesh->SetMaterial(0, NewPolarity == EMagneticPolarity::POSITIVE ? MaterialPositive : MaterialNegative);
+	Mesh->SetMaterial(4, NewPolarity == EMagneticPolarity::POSITIVE ? MatPos : MatNeg);
 
 	bCanSwitchPolarity = false;
 	GetWorld()->GetTimerManager().SetTimer(PolarityTimerHandle, this, &ACPP_Vehicle::OnPolarityTimerEnd, 1, false, PolarityDelay);
@@ -355,17 +368,27 @@ void ACPP_Vehicle::HandleTogglePolarity()
 	if (MagnetInRange == nullptr) return;
 	if (MagnetInRange->GetMagneticPolarity() == NewPolarity)
 	{
-		float CurveFloatValue = CurveBoost->GetFloatValue(GetCurveBoostDuration());
+		float BoostDistance = GetDistanceToMagnet();
+		float BoostMultiplier = CurveBoostMultiplier->GetFloatValue(BoostDistance);
+		float BoostDuration = CurveBoostDuration->GetFloatValue(BoostDistance);
+		float NewAccelerationSpeed = AccelerationSpeed * BoostMultiplier;
+		float NewCameraZoom = CameraCurrentZoom * BoostMultiplier;
 
-		AccelerationSpeed *= CurveFloatValue;
-		CameraCurrentZoom = CameraCurrentZoom * CurveFloatValue;
+		AccelerationSpeed = NewAccelerationSpeed > MaxBoostAccelerationSpeed ? MaxBoostAccelerationSpeed : NewAccelerationSpeed;
+		CameraCurrentZoom = NewCameraZoom > MaxBoostCameraZoom ? MaxBoostCameraZoom : NewCameraZoom;
 
-		GetWorld()->GetTimerManager().SetTimer(BoostTimerHandle, this, &ACPP_Vehicle::OnBoostTimerEnd, 1, false, CurveFloatValue);
+		GetWorld()->GetTimerManager().SetTimer(BoostTimerHandle, this, &ACPP_Vehicle::OnBoostTimerEnd, 1, false, BoostDuration);
 	}
 	else
 	{
 		AccelerationSpeed = InitialAccelerationSpeed;
 	}
+}
+
+// Reset Pawn Transform Input Action handler
+void ACPP_Vehicle::HandleRestart() {
+	SetActorLocation(InitialPosition);
+	SetActorRotation(InitialRotation);
 }
 
 void ACPP_Vehicle::OnPolarityTimerEnd()
