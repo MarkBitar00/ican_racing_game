@@ -108,10 +108,10 @@ protected:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	// Pawn components
-	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category="Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components", Replicated)
 	UStaticMeshComponent* Mesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category="Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
 	UCameraComponent* Camera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
@@ -136,22 +136,22 @@ protected:
 	USceneComponent* SteerRightLocation;
 
 	// Input components
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* DefaultMappingContext;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ActionAccelerate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ActionSteer;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ActionBrake;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ActionTogglePolarity;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ActionRestart;
 
 	// Input Actions handler methods
@@ -177,7 +177,10 @@ protected:
 	void HandleSteer(float Steer, FVector Force, FVector Location);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void HandleTogglePolarity();
+	void HandleTogglePolarity(EMagneticPolarity NewPolarity, UMaterialInterface* NewMaterial);
+
+	UFUNCTION(Server, Reliable)
+	void HandleTogglePolarityServer(EMagneticPolarity NewPolarity, UMaterialInterface* NewMaterial);
 
 	// Attributes (Camera)
 	UPROPERTY(BlueprintReadonly, Category = "Camera")

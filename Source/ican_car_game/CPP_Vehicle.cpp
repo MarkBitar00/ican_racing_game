@@ -24,6 +24,7 @@ ACPP_Vehicle::ACPP_Vehicle()
 	MaterialPositiveFallback = MaterialPositiveFallbackFile.Object;
 	MaterialNegativeFallback = MaterialNegativeFallbackFile.Object;
 	Mesh->SetMaterial(4, MaterialPositiveFallbackFile.Object);
+	Mesh->SetIsReplicated(true);
 
 	// Create Spring Arm and attach it to Root Component
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
@@ -81,6 +82,7 @@ void ACPP_Vehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACPP_Vehicle, MagneticPolarity);
+	DOREPLIFETIME(ACPP_Vehicle, Mesh);
 }
 
 // Called when the game starts or when spawned
@@ -350,17 +352,12 @@ void ACPP_Vehicle::TogglePolarity()
 {
 	if (!bCanSwitchPolarity) return;
 
-	HandleTogglePolarity();
-}
-
-void ACPP_Vehicle::HandleTogglePolarity_Implementation()
-{
 	EMagneticPolarity NewPolarity = MagneticPolarity == EMagneticPolarity::POSITIVE ? EMagneticPolarity::NEGATIVE : EMagneticPolarity::POSITIVE;
 	UMaterialInterface* MatPos = MaterialPositive != nullptr ? MaterialPositive : MaterialPositiveFallback;
 	UMaterialInterface* MatNeg = MaterialNegative != nullptr ? MaterialNegative : MaterialNegativeFallback;
+	UMaterialInterface* NewMaterial = NewPolarity == EMagneticPolarity::POSITIVE ? MatPos : MatNeg;
 
-	MagneticPolarity = NewPolarity;
-	Mesh->SetMaterial(4, NewPolarity == EMagneticPolarity::POSITIVE ? MatPos : MatNeg);
+	HandleTogglePolarity(NewPolarity, NewMaterial);
 
 	bCanSwitchPolarity = false;
 	GetWorld()->GetTimerManager().SetTimer(PolarityTimerHandle, this, &ACPP_Vehicle::OnPolarityTimerEnd, 1, false, PolarityDelay);
@@ -383,6 +380,20 @@ void ACPP_Vehicle::HandleTogglePolarity_Implementation()
 	{
 		AccelerationSpeed = InitialAccelerationSpeed;
 	}
+}
+
+void ACPP_Vehicle::HandleTogglePolarity_Implementation(EMagneticPolarity NewPolarity, UMaterialInterface* NewMaterial)
+{
+	MagneticPolarity = NewPolarity;
+	Mesh->SetMaterial(4, NewMaterial);
+
+	HandleTogglePolarityServer(NewPolarity, NewMaterial);
+}
+
+void ACPP_Vehicle::HandleTogglePolarityServer_Implementation(EMagneticPolarity NewPolarity, UMaterialInterface* NewMaterial)
+{
+	MagneticPolarity = NewPolarity;
+	Mesh->SetMaterial(4, NewMaterial);
 }
 
 // Reset Pawn Transform Input Action handler
