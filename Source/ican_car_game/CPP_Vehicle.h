@@ -5,6 +5,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/TimelineComponent.h"
+#include "Components/SphereComponent.h"
 #include "CPP_HoverComponent.h"
 #include "CPP_E_MagneticPolarity.h"
 #include "InputActionValue.h"
@@ -26,6 +27,13 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	// Collision Sphere overlap functions
+	UFUNCTION()
+	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	// Events
 	UFUNCTION(BlueprintImplementableEvent)
@@ -74,10 +82,10 @@ public:
 	EMagneticPolarity GetMagneticPolarity();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
-	FORCEINLINE class UCurveFloat* GetCurveAttraction() const { return CurveAttraction; }
+	FORCEINLINE class UCurveFloat* GetCurveMagnetAttraction() const { return CurveMagnetAttraction; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
-	FORCEINLINE class UCurveFloat* GetCurveRepulsion() const { return CurveRepulsion; }
+	FORCEINLINE class UCurveFloat* GetCurveMagnetRepulsion() const { return CurveMagnetRepulsion; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
 	FORCEINLINE class ACPP_Magnet* GetMagnetInRange() const { return MagnetInRange; }
@@ -110,6 +118,9 @@ protected:
 	// Pawn components
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components", Replicated)
 	UStaticMeshComponent* Mesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components", Replicated)
+	USphereComponent* CollisionSphere;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Components")
 	UCameraComponent* Camera;
@@ -210,10 +221,16 @@ protected:
 	EMagneticPolarity MagneticPolarity = EMagneticPolarity::POSITIVE;
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
-	UCurveFloat* CurveAttraction = nullptr;
+	UCurveFloat* CurveMagnetAttraction = nullptr;
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
-	UCurveFloat* CurveRepulsion = nullptr;
+	UCurveFloat* CurveMagnetRepulsion = nullptr;
+
+	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
+	UCurveFloat* CurveVehicleAttraction = nullptr;
+
+	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
+	UCurveFloat* CurveVehicleRepulsion = nullptr;
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	UCurveFloat* CurveBoostMultiplier = nullptr;
@@ -298,6 +315,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
 	float PolarityDelay = 1;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
+	bool bActivateVehicleMagnetism = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
+	float ColliderRadius = 800;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
+	float VehicleMagneticPower = 500;
+
 	// Public attributes (Materials)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Materials")
 	UMaterialInterface* MaterialPositive = nullptr;
@@ -306,6 +332,10 @@ public:
 	UMaterialInterface* MaterialNegative = nullptr;
 
 private:
+	// Attributes (Magnetism)
+	UPROPERTY()
+	TArray<ACPP_Vehicle*> PlayersInRange;
+
 	// Materials
 	UMaterialInterface* MaterialPositiveFallback = nullptr;
 	UMaterialInterface* MaterialNegativeFallback = nullptr;
