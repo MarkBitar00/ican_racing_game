@@ -36,6 +36,7 @@ void ACPP_Magnet::OnConstruction(const FTransform& Transform)
 	UMaterialInterface* MatNeg = MaterialNegative != nullptr ? MaterialNegative : MaterialNegativeFallback;
 
 	Mesh->SetMaterial(0, MagneticPolarity == EMagneticPolarity::POSITIVE ? MatPos : MatNeg);
+	Collider->SetSphereRadius(ColliderRadius);
 }
 
 // Called when the game starts or when spawned
