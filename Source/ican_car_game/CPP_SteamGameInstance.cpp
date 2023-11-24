@@ -77,7 +77,8 @@ void UCPP_SteamGameInstance::CreateServer()
 	SessionSettings.bIsLANMatch = (IOnlineSubsystem::Get()->GetSubsystemName() == "NULL");
 	SessionSettings.bShouldAdvertise = true;
 	SessionSettings.bUsesPresence = true;
-	SessionSettings.NumPublicConnections = 5;
+	SessionSettings.bUseLobbiesIfAvailable = true;
+	SessionSettings.NumPublicConnections = 4;
 
 	SessionInterface->CreateSession(0, FName("Polar Drift Steam Session"), SessionSettings);
 }
