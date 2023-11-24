@@ -19,6 +19,7 @@ void UCPP_SteamGameInstance::Init()
 			SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UCPP_SteamGameInstance::OnCreateSessionComplete);
 			SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UCPP_SteamGameInstance::OnFindSessionComplete);
 			SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UCPP_SteamGameInstance::OnJoinSessionComplete);
+			//SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UCPP_SteamGameInstance::OnDestroySessionComplete);
 		}
 	}
 }
@@ -58,6 +59,14 @@ void UCPP_SteamGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSes
 	}
 }
 
+void UCPP_SteamGameInstance::OnDestroySessionComplete(bool Succeeded)
+{
+	if (Succeeded)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DestroyServer"));
+	}
+}
+
 void UCPP_SteamGameInstance::CreateServer()
 {
 	UE_LOG(LogTemp, Warning, TEXT("CreateServer"));
@@ -81,4 +90,9 @@ void UCPP_SteamGameInstance::JoinServer()
 	SessionSearch->QuerySettings.Set("SEARCH_PRESENCE", true, EOnlineComparisonOp::Equals);
 
 	SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
+}
+
+void UCPP_SteamGameInstance::DestroyServer()
+{
+	SessionInterface->DestroySession(FName("Polar Drift Steam Session"));
 }
