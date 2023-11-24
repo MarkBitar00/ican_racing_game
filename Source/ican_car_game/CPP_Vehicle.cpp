@@ -150,8 +150,8 @@ void ACPP_Vehicle::Tick(float DeltaTime)
 	SpringArm->SocketOffset.Y = FMath::FInterpTo(SpringArm->SocketOffset.Y, CameraCurrentOffset, DeltaTime, CameraInterpolationSpeed);
 
 	// Smooth out Center Of Mass Location
-	UpdateCenterOfMass();
-	Mesh->SetCenterOfMass(FVector(0, 0, FMath::FInterpTo(Mesh->GetCenterOfMass().Z, -CenterOfMassHeight, DeltaTime, 100)));
+	//UpdateCenterOfMass();
+	//Mesh->SetCenterOfMass(FVector(0, 0, FMath::FInterpTo(Mesh->GetCenterOfMass().Z, -CenterOfMassHeight, DeltaTime, 100)));
 
 	// Clamp Mesh rotation
 	FRotator CurrentRotation = Mesh->GetComponentRotation();
