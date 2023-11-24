@@ -24,10 +24,14 @@ protected:
 	virtual void OnCreateSessionComplete(FName SessionName, bool Succeeded);
 	virtual void OnFindSessionComplete(bool Succeeded);
 	virtual void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+	virtual void OnDestroySessionComplete(bool Succeeded);
 
 	UFUNCTION(BlueprintCallable)
 	void CreateServer();
 
 	UFUNCTION(BlueprintCallable)
 	void JoinServer();
+
+	UFUNCTION(BlueprintCallable)
+	void DestroyServer();
 };
