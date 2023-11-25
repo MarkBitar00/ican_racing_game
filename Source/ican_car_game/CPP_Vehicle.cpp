@@ -66,17 +66,20 @@ ACPP_Vehicle::ACPP_Vehicle()
 	CurveBoostDuration = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoostDuration"));
 	CurveVehicleAttraction = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveVehicleAttraction"));
 	CurveVehicleRepulsion = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveVehicleRepulsion"));
+	CurveFieldOfView = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveFieldOfView"));
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>
 		CurveAccelerationFile(TEXT("/Game/Utils/AccelerationCurve")),
 		CurveBoostMultiplierFile(TEXT("/Game/Utils/BoostMultiplierCurve")),
 		CurveBoostDurationFile(TEXT("/Game/Utils/BoostDurationCurve")),
 		CurveVehicleAttractionFile(TEXT("/Game/Utils/VehicleAttractionCurve")),
-		CurveVehicleRepulsionFile(TEXT("/Game/Utils/VehicleRepulsionCurve"));
+		CurveVehicleRepulsionFile(TEXT("/Game/Utils/VehicleRepulsionCurve")),
+		CurveFieldOfViewFile(TEXT("/Game/Utils/FieldOfViewCurve"));
 	CurveAcceleration = CurveAccelerationFile.Object;
 	CurveBoostMultiplier = CurveBoostMultiplierFile.Object;
 	CurveBoostDuration = CurveBoostDurationFile.Object;
 	CurveVehicleAttraction = CurveVehicleAttractionFile.Object;
 	CurveVehicleRepulsion = CurveVehicleRepulsionFile.Object;
+	CurveFieldOfView = CurveFieldOfViewFile.Object;
 
 	// Add tag for Magnet overlaps
 	this->Tags.Add(FName("HoverVehicle"));
@@ -109,6 +112,7 @@ void ACPP_Vehicle::BeginPlay()
 	// Set initial attribute values
 	InitialAccelerationSpeed = AccelerationSpeed;
 	CameraCurrentZoom = CameraInitialZoom;
+	CameraCurrentFieldOfView = CameraInitialFieldOfView;
 	CameraCurrentOffset = 0;
 	InitialPosition = GetActorLocation();
 	InitialRotation = GetActorRotation();
@@ -116,7 +120,7 @@ void ACPP_Vehicle::BeginPlay()
 	// Setup Camera properties
 	SpringArm->SocketOffset = FVector(0, 0, SpringArmTargetOffset);
 	Camera->SetRelativeRotation(FRotator(CameraRotation, 0, 0));
-	Camera->SetFieldOfView(CameraFieldOfView);
+	Camera->SetFieldOfView(CameraInitialFieldOfView);
 
 	// Setup Mesh properties
 	Mesh->SetSimulatePhysics(true);
@@ -139,9 +143,10 @@ void ACPP_Vehicle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Smooth out Spring Arm length and offset movements
+	// Smooth out Spring Arm and Camera properties
 	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, CameraCurrentZoom, DeltaTime, CameraInterpolationSpeed);
 	SpringArm->SocketOffset.Y = FMath::FInterpTo(SpringArm->SocketOffset.Y, CameraCurrentOffset, DeltaTime, CameraInterpolationSpeed);
+	Camera->FieldOfView = FMath::FInterpTo(Camera->FieldOfView, CameraCurrentFieldOfView, DeltaTime, CameraInterpolationSpeed);
 
 	// Smooth out Center Of Mass Location
 	//UpdateCenterOfMass();
@@ -419,11 +424,14 @@ void ACPP_Vehicle::TogglePolarity()
 		float BoostDistance = GetDistanceToMagnet();
 		float BoostMultiplier = CurveBoostMultiplier->GetFloatValue(BoostDistance);
 		float BoostDuration = CurveBoostDuration->GetFloatValue(BoostDistance);
+		float FieldOfViewMultiplier = CurveFieldOfView->GetFloatValue(BoostDistance);
 		float NewAccelerationSpeed = AccelerationSpeed * BoostMultiplier;
 		float NewCameraZoom = CameraCurrentZoom * BoostMultiplier;
+		float NewFieldOfView = CameraCurrentFieldOfView * FieldOfViewMultiplier;
 
 		AccelerationSpeed = NewAccelerationSpeed > MaxBoostAccelerationSpeed ? MaxBoostAccelerationSpeed : NewAccelerationSpeed;
 		CameraCurrentZoom = NewCameraZoom > MaxBoostCameraZoom ? MaxBoostCameraZoom : NewCameraZoom;
+		CameraCurrentFieldOfView = NewFieldOfView > MaxCameraFieldOfView ? MaxCameraFieldOfView : NewFieldOfView;
 
 		GetWorld()->GetTimerManager().SetTimer(BoostTimerHandle, this, &ACPP_Vehicle::OnBoostTimerEnd, 1, false, BoostDuration);
 	}
@@ -463,4 +471,5 @@ void ACPP_Vehicle::OnBoostTimerEnd()
 {
 	AccelerationSpeed = InitialAccelerationSpeed;
 	CameraCurrentZoom = MaxCameraZoom;
+	CameraCurrentFieldOfView = CameraInitialFieldOfView;
 }
