@@ -55,6 +55,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
 	EMagneticPolarity MagneticPolarity = EMagneticPolarity::POSITIVE;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
+	UCurveFloat* CurveAttraction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
+	UCurveFloat* CurveRepulsion = nullptr;
+
 	// Public attributes (Materials)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Materials")
 	UMaterialInterface* MaterialPositive = nullptr;
@@ -70,4 +76,8 @@ private:
 	// Materials
 	UMaterialInterface* MaterialPositiveFallback = nullptr;
 	UMaterialInterface* MaterialNegativeFallback = nullptr;
+
+	// Curves
+	UCurveFloat* CurveAttractionFallback = nullptr;
+	UCurveFloat* CurveRepulsionFallback = nullptr;
 };

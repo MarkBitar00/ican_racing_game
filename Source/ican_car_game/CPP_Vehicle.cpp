@@ -66,23 +66,17 @@ ACPP_Vehicle::ACPP_Vehicle()
 	CurveBoostDuration = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoostDuration"));
 	CurveVehicleAttraction = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveVehicleAttraction"));
 	CurveVehicleRepulsion = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveVehicleRepulsion"));
-	CurveMagnetAttraction = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveMagnetAttraction"));
-	CurveMagnetRepulsion = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveMagnetRepulsion"));
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>
 		CurveAccelerationFile(TEXT("/Game/Utils/AccelerationCurve")),
 		CurveBoostMultiplierFile(TEXT("/Game/Utils/BoostMultiplierCurve")),
 		CurveBoostDurationFile(TEXT("/Game/Utils/BoostDurationCurve")),
 		CurveVehicleAttractionFile(TEXT("/Game/Utils/VehicleAttractionCurve")),
-		CurveVehicleRepulsionFile(TEXT("/Game/Utils/VehicleRepulsionCurve")),
-		CurveMagnetAttractionFile(TEXT("/Game/Utils/AttractionCurve")),
-		CurveMagnetRepulsionFile(TEXT("/Game/Utils/RepulsionCurve"));
+		CurveVehicleRepulsionFile(TEXT("/Game/Utils/VehicleRepulsionCurve"));
 	CurveAcceleration = CurveAccelerationFile.Object;
 	CurveBoostMultiplier = CurveBoostMultiplierFile.Object;
 	CurveBoostDuration = CurveBoostDurationFile.Object;
 	CurveVehicleAttraction = CurveVehicleAttractionFile.Object;
 	CurveVehicleRepulsion = CurveVehicleRepulsionFile.Object;
-	CurveMagnetAttraction = CurveMagnetAttractionFile.Object;
-	CurveMagnetRepulsion = CurveMagnetRepulsionFile.Object;
 
 	// Add tag for Magnet overlaps
 	this->Tags.Add(FName("HoverVehicle"));

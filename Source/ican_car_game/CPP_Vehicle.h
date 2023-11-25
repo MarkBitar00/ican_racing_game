@@ -82,12 +82,6 @@ public:
 	EMagneticPolarity GetMagneticPolarity();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
-	FORCEINLINE class UCurveFloat* GetCurveMagnetAttraction() const { return CurveMagnetAttraction; }
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
-	FORCEINLINE class UCurveFloat* GetCurveMagnetRepulsion() const { return CurveMagnetRepulsion; }
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Getters | Magnetism")
 	FORCEINLINE class ACPP_Magnet* GetMagnetInRange() const { return MagnetInRange; }
 
 	// Setter functions
@@ -219,12 +213,6 @@ protected:
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism", Replicated)
 	EMagneticPolarity MagneticPolarity = EMagneticPolarity::POSITIVE;
-
-	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
-	UCurveFloat* CurveMagnetAttraction = nullptr;
-
-	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
-	UCurveFloat* CurveMagnetRepulsion = nullptr;
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	UCurveFloat* CurveVehicleAttraction = nullptr;

@@ -25,6 +25,15 @@ ACPP_Magnet::ACPP_Magnet()
 	Mesh->SetRelativeScale3D(FVector(3, 3, 10));
 	Mesh->SetRelativeLocation(FVector(0, 0, 500));
 	Mesh->SetupAttachment(RootComponent);
+
+	// Create Curves and set default
+	CurveAttractionFallback = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveAttractionFallback"));
+	CurveRepulsionFallback = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveRepulsionFallback"));
+	static ConstructorHelpers::FObjectFinder<UCurveFloat>
+		CurveAttractionFallbackFile(TEXT("/Game/Utils/AttractionCurve")),
+		CurveRepulsionFallbackFile(TEXT("/Game/Utils/RepulsionCurve"));
+	CurveAttractionFallback = CurveAttractionFallbackFile.Object;
+	CurveRepulsionFallback = CurveRepulsionFallbackFile.Object;
 }
 
 void ACPP_Magnet::OnConstruction(const FTransform& Transform)
@@ -65,7 +74,10 @@ void ACPP_Magnet::Tick(float DeltaTime)
 		float LocationsDistance = FVector::Dist(FVector::VectorPlaneProject(VehicleLocation, VectorProjectionPlaneNormal), FVector::VectorPlaneProject(MagnetLocation, VectorProjectionPlaneNormal));
 		float CurveTime = LocationsDistance / ColliderRadius;
 
-		UCurveFloat* Curve = bIsSamePolarity ? Vehicle->GetCurveMagnetRepulsion() : Vehicle->GetCurveMagnetAttraction();
+		UCurveFloat* Attraction = CurveAttraction != nullptr ? CurveAttraction : CurveAttractionFallback;
+		UCurveFloat* Repulsion = CurveRepulsion != nullptr ? CurveRepulsion : CurveAttractionFallback;
+
+		UCurveFloat* Curve = bIsSamePolarity ? Repulsion : Attraction;
 		float CurveFloatValue = Curve->GetFloatValue(CurveTime);
 
 		FVector Force = (VehicleLocation - MagnetLocation) * (bIsSamePolarity ? MagnetPower : -MagnetPower) * CurveFloatValue;
