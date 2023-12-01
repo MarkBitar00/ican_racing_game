@@ -23,7 +23,6 @@ ACPP_Vehicle::ACPP_Vehicle()
 		MaterialNegativeFallbackFile(TEXT("/Game/Materials/MaterialInstances/M_Negative"));
 	MaterialPositiveFallback = MaterialPositiveFallbackFile.Object;
 	MaterialNegativeFallback = MaterialNegativeFallbackFile.Object;
-	Mesh->SetMaterial(4, MaterialPositiveFallbackFile.Object);
 	Mesh->SetIsReplicated(true);
 
 	// Create Collision Sphere and set radius
@@ -66,20 +65,23 @@ ACPP_Vehicle::ACPP_Vehicle()
 	CurveBoostDuration = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBoostDuration"));
 	CurveVehicleAttraction = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveVehicleAttraction"));
 	CurveVehicleRepulsion = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveVehicleRepulsion"));
-	CurveFieldOfView = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveFieldOfView"));
+	CurveFieldOfView = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveFieldOfView")),
+	CurveBlur = CreateDefaultSubobject<UCurveFloat>(TEXT("CurveBlur"));
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>
 		CurveAccelerationFile(TEXT("/Game/Utils/AccelerationCurve")),
 		CurveBoostMultiplierFile(TEXT("/Game/Utils/BoostMultiplierCurve")),
 		CurveBoostDurationFile(TEXT("/Game/Utils/BoostDurationCurve")),
 		CurveVehicleAttractionFile(TEXT("/Game/Utils/VehicleAttractionCurve")),
 		CurveVehicleRepulsionFile(TEXT("/Game/Utils/VehicleRepulsionCurve")),
-		CurveFieldOfViewFile(TEXT("/Game/Utils/FieldOfViewCurve"));
+		CurveFieldOfViewFile(TEXT("/Game/Utils/FieldOfViewCurve")),
+		CurveBlurFile(TEXT("/Game/Utils/BlurCurve"));
 	CurveAcceleration = CurveAccelerationFile.Object;
 	CurveBoostMultiplier = CurveBoostMultiplierFile.Object;
 	CurveBoostDuration = CurveBoostDurationFile.Object;
 	CurveVehicleAttraction = CurveVehicleAttractionFile.Object;
 	CurveVehicleRepulsion = CurveVehicleRepulsionFile.Object;
 	CurveFieldOfView = CurveFieldOfViewFile.Object;
+	CurveBlur = CurveBlurFile.Object;
 
 	// Add tag for Magnet overlaps
 	this->Tags.Add(FName("HoverVehicle"));
@@ -113,6 +115,7 @@ void ACPP_Vehicle::BeginPlay()
 	InitialAccelerationSpeed = AccelerationSpeed;
 	CameraCurrentZoom = CameraInitialZoom;
 	CameraCurrentFieldOfView = CameraInitialFieldOfView;
+	CameraCurrentBlur = CameraInitialBlur;
 	CameraCurrentOffset = 0;
 	InitialPosition = GetActorLocation();
 	InitialRotation = GetActorRotation();
@@ -121,8 +124,14 @@ void ACPP_Vehicle::BeginPlay()
 	SpringArm->SocketOffset = FVector(0, 0, SpringArmTargetOffset);
 	Camera->SetRelativeRotation(FRotator(CameraRotation, 0, 0));
 	Camera->SetFieldOfView(CameraInitialFieldOfView);
+	Camera->PostProcessSettings.bOverride_SceneFringeIntensity = true;
+	Camera->PostProcessSettings.SceneFringeIntensity = CameraInitialBlur;
 
 	// Setup Mesh properties
+	UMaterialInterface* MatPos = MaterialPositive != nullptr ? MaterialPositive : MaterialPositiveFallback;
+	UMaterialInterface* MatNeg = MaterialNegative != nullptr ? MaterialNegative : MaterialNegativeFallback;
+	UMaterialInterface* PolarityMaterial = MagneticPolarity == EMagneticPolarity::POSITIVE ? MatPos : MatNeg;
+	Mesh->SetMaterial(4, PolarityMaterial);
 	Mesh->SetSimulatePhysics(true);
 	Mesh->SetLinearDamping(LinearDamping);
 	Mesh->SetAngularDamping(AngularDamping);
@@ -147,10 +156,11 @@ void ACPP_Vehicle::Tick(float DeltaTime)
 	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, CameraCurrentZoom, DeltaTime, CameraInterpolationSpeed);
 	SpringArm->SocketOffset.Y = FMath::FInterpTo(SpringArm->SocketOffset.Y, CameraCurrentOffset, DeltaTime, CameraInterpolationSpeed);
 	Camera->FieldOfView = FMath::FInterpTo(Camera->FieldOfView, CameraCurrentFieldOfView, DeltaTime, CameraInterpolationSpeed);
+	Camera->PostProcessSettings.SceneFringeIntensity = FMath::FInterpTo(Camera->PostProcessSettings.SceneFringeIntensity, CameraCurrentBlur, DeltaTime, CameraInterpolationSpeed);
 
 	// Smooth out Center Of Mass Location
-	//UpdateCenterOfMass();
-	//Mesh->SetCenterOfMass(FVector(0, 0, FMath::FInterpTo(Mesh->GetCenterOfMass().Z, -CenterOfMassHeight, DeltaTime, 100)));
+	UpdateCenterOfMass();
+	Mesh->SetCenterOfMass(FVector(0, 0, FMath::FInterpTo(Mesh->GetCenterOfMass().Z, -CenterOfMassHeight, DeltaTime, 100)));
 
 	// Clamp Mesh rotation
 	FRotator CurrentRotation = Mesh->GetComponentRotation();
@@ -425,13 +435,16 @@ void ACPP_Vehicle::TogglePolarity()
 		float BoostMultiplier = CurveBoostMultiplier->GetFloatValue(BoostDistance);
 		float BoostDuration = CurveBoostDuration->GetFloatValue(BoostDistance);
 		float FieldOfViewMultiplier = CurveFieldOfView->GetFloatValue(BoostDistance);
+		float AddedBlur = CurveBlur->GetFloatValue(BoostDistance);
 		float NewAccelerationSpeed = AccelerationSpeed * BoostMultiplier;
 		float NewCameraZoom = CameraCurrentZoom * BoostMultiplier;
 		float NewFieldOfView = CameraCurrentFieldOfView * FieldOfViewMultiplier;
+		float NewBlur = CameraCurrentBlur + AddedBlur;
 
 		AccelerationSpeed = NewAccelerationSpeed > MaxBoostAccelerationSpeed ? MaxBoostAccelerationSpeed : NewAccelerationSpeed;
 		CameraCurrentZoom = NewCameraZoom > MaxBoostCameraZoom ? MaxBoostCameraZoom : NewCameraZoom;
 		CameraCurrentFieldOfView = NewFieldOfView > MaxCameraFieldOfView ? MaxCameraFieldOfView : NewFieldOfView;
+		CameraCurrentBlur = NewBlur > MaxCameraBlur ? MaxCameraBlur : NewBlur;
 
 		GetWorld()->GetTimerManager().SetTimer(BoostTimerHandle, this, &ACPP_Vehicle::OnBoostTimerEnd, 1, false, BoostDuration);
 	}
@@ -472,4 +485,5 @@ void ACPP_Vehicle::OnBoostTimerEnd()
 	AccelerationSpeed = InitialAccelerationSpeed;
 	CameraCurrentZoom = MaxCameraZoom;
 	CameraCurrentFieldOfView = CameraInitialFieldOfView;
+	CameraCurrentBlur = CameraInitialBlur;
 }
