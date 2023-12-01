@@ -197,6 +197,9 @@ protected:
 	UPROPERTY(BlueprintReadonly, Category = "Camera")
 	float CameraCurrentFieldOfView = 0;
 
+	UPROPERTY(BlueprintReadonly, Category = "Camera")
+	float CameraCurrentBlur = 0;
+
 	// Attributes (Movement)
 	UPROPERTY(BlueprintReadonly, Category = "Movement")
 	float InitialAccelerationSpeed = 12000;
@@ -231,6 +234,9 @@ protected:
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	UCurveFloat* CurveFieldOfView = nullptr;
+
+	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
+	UCurveFloat* CurveBlur = nullptr;
 
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	ACPP_Magnet* MagnetInRange = nullptr;
@@ -269,6 +275,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
 	float MaxCameraFieldOfView = 130;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
+	float CameraInitialBlur = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
+	float MaxCameraBlur = 3;
 
 	// Public attributes (Movement)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
