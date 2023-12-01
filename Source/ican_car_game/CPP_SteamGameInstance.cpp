@@ -19,7 +19,6 @@ void UCPP_SteamGameInstance::Init()
 			SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UCPP_SteamGameInstance::OnCreateSessionComplete);
 			SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UCPP_SteamGameInstance::OnFindSessionComplete);
 			SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UCPP_SteamGameInstance::OnJoinSessionComplete);
-			//SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UCPP_SteamGameInstance::OnDestroySessionComplete);
 		}
 	}
 }
@@ -28,7 +27,7 @@ void UCPP_SteamGameInstance::OnCreateSessionComplete(FName SessionName, bool Suc
 {
 	if (Succeeded)
 	{
-		GetWorld()->ServerTravel("/Game/Levels/Nico-landscape_better?listen");
+		GetWorld()->ServerTravel("/Game/Levels/LEVEL_GA?listen");
 	}
 }
 
