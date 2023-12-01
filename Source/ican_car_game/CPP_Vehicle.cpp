@@ -23,7 +23,6 @@ ACPP_Vehicle::ACPP_Vehicle()
 		MaterialNegativeFallbackFile(TEXT("/Game/Materials/MaterialInstances/M_Negative"));
 	MaterialPositiveFallback = MaterialPositiveFallbackFile.Object;
 	MaterialNegativeFallback = MaterialNegativeFallbackFile.Object;
-	Mesh->SetMaterial(4, MaterialPositiveFallbackFile.Object);
 	Mesh->SetIsReplicated(true);
 
 	// Create Collision Sphere and set radius
@@ -123,6 +122,11 @@ void ACPP_Vehicle::BeginPlay()
 	Camera->SetFieldOfView(CameraInitialFieldOfView);
 
 	// Setup Mesh properties
+	UMaterialInterface* MatPos = MaterialPositive != nullptr ? MaterialPositive : MaterialPositiveFallback;
+	UMaterialInterface* MatNeg = MaterialNegative != nullptr ? MaterialNegative : MaterialNegativeFallback;
+	UMaterialInterface* PolarityMaterial = MagneticPolarity == EMagneticPolarity::POSITIVE ? MatPos : MatNeg;
+
+	Mesh->SetMaterial(4, PolarityMaterial);
 	Mesh->SetSimulatePhysics(true);
 	Mesh->SetLinearDamping(LinearDamping);
 	Mesh->SetAngularDamping(AngularDamping);
