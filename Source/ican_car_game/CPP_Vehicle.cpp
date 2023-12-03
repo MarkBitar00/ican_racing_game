@@ -19,8 +19,8 @@ ACPP_Vehicle::ACPP_Vehicle()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(Mesh);
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance>
-		MaterialPositiveFallbackFile(TEXT("/Game/Materials/MaterialInstances/M_Positive")),
-		MaterialNegativeFallbackFile(TEXT("/Game/Materials/MaterialInstances/M_Negative"));
+		MaterialPositiveFallbackFile(TEXT("/Game/Materials/NEW_EMISSIVE/EMISSIVE_ROUGE")),
+		MaterialNegativeFallbackFile(TEXT("/Game/Materials/NEW_EMISSIVE/EMISSIVE_BLEU"));
 	MaterialPositiveFallback = MaterialPositiveFallbackFile.Object;
 	MaterialNegativeFallback = MaterialNegativeFallbackFile.Object;
 	Mesh->SetIsReplicated(true);
