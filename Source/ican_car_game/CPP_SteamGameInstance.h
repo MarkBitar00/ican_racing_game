@@ -27,10 +27,13 @@ protected:
 	virtual void OnDestroySessionComplete(bool Succeeded);
 
 	UFUNCTION(BlueprintCallable)
-	void CreateServer();
+	void CreateServer(FName SessionName, int Slots);
 
 	UFUNCTION(BlueprintCallable)
 	void JoinServer();
+
+	UFUNCTION(BlueprintCallable)
+	void FindServers();
 
 	UFUNCTION(BlueprintCallable)
 	void DestroyServer();

@@ -39,14 +39,6 @@
 			"Enabled": true
 		},
 		{
-			"Name": "AdvancedSteamSessions",
-			"Enabled": false
-		},
-		{
-			"Name": "AdvancedSessions",
-			"Enabled": false
-		},
-		{
 			"Name": "OnlineSubsystemGooglePlay",
 			"Enabled": false,
 			"SupportedTargetPlatforms": [
