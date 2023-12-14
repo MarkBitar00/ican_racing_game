@@ -131,6 +131,7 @@ void ACPP_Vehicle::BeginPlay()
 	UMaterialInterface* MatPos = MaterialPositive != nullptr ? MaterialPositive : MaterialPositiveFallback;
 	UMaterialInterface* MatNeg = MaterialNegative != nullptr ? MaterialNegative : MaterialNegativeFallback;
 	UMaterialInterface* PolarityMaterial = MagneticPolarity == EMagneticPolarity::POSITIVE ? MatPos : MatNeg;
+	Mesh->SetMaterial(2, PolarityMaterial);
 	Mesh->SetMaterial(4, PolarityMaterial);
 	Mesh->SetSimulatePhysics(true);
 	Mesh->SetLinearDamping(LinearDamping);
@@ -457,6 +458,7 @@ void ACPP_Vehicle::TogglePolarity()
 void ACPP_Vehicle::HandleTogglePolarity_Implementation(EMagneticPolarity NewPolarity, UMaterialInterface* NewMaterial)
 {
 	MagneticPolarity = NewPolarity;
+	Mesh->SetMaterial(2, NewMaterial);
 	Mesh->SetMaterial(4, NewMaterial);
 
 	HandleTogglePolarityServer(NewPolarity, NewMaterial);
@@ -465,6 +467,7 @@ void ACPP_Vehicle::HandleTogglePolarity_Implementation(EMagneticPolarity NewPola
 void ACPP_Vehicle::HandleTogglePolarityServer_Implementation(EMagneticPolarity NewPolarity, UMaterialInterface* NewMaterial)
 {
 	MagneticPolarity = NewPolarity;
+	Mesh->SetMaterial(2, NewMaterial);
 	Mesh->SetMaterial(4, NewMaterial);
 }
 
