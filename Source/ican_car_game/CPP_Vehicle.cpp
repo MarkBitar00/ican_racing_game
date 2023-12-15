@@ -223,10 +223,6 @@ void ACPP_Vehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		// Bind Toggle Polarity Input Action handler method
 		if (ActionTogglePolarity)
 			EnhancedInputComponent->BindAction(ActionTogglePolarity, ETriggerEvent::Started, this, &ACPP_Vehicle::TogglePolarity);
-
-		// Bind Reset Pawn Transform Input Action handler method
-		if (ActionRestart)
-			EnhancedInputComponent->BindAction(ActionRestart, ETriggerEvent::Started, this, &ACPP_Vehicle::HandleRestart);
 	}
 }
 
@@ -468,12 +464,6 @@ void ACPP_Vehicle::HandleTogglePolarityServer_Implementation(EMagneticPolarity N
 	MagneticPolarity = NewPolarity;
 	Mesh->SetMaterial(2, NewMaterial);
 	Mesh->SetMaterial(4, NewMaterial);
-}
-
-// Reset Pawn Transform Input Action handler
-void ACPP_Vehicle::HandleRestart() {
-	SetActorLocation(InitialPosition);
-	SetActorRotation(InitialRotation);
 }
 
 void ACPP_Vehicle::OnPolarityTimerEnd()
