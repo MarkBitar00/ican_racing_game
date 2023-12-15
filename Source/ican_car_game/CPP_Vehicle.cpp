@@ -117,8 +117,6 @@ void ACPP_Vehicle::BeginPlay()
 	CameraCurrentFieldOfView = CameraInitialFieldOfView;
 	CameraCurrentBlur = CameraInitialBlur;
 	CameraCurrentOffset = 0;
-	InitialPosition = GetActorLocation();
-	InitialRotation = GetActorRotation();
 
 	// Setup Camera properties
 	SpringArm->SocketOffset = FVector(0, 0, SpringArmTargetOffset);
