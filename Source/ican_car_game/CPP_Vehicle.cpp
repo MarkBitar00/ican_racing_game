@@ -263,7 +263,6 @@ void ACPP_Vehicle::UpdateCenterOfMass()
 	UWorld* World = GetWorld();
 
 	bool bHit = World->LineTraceSingleByChannel(Hit, WorldLocation, LineTraceEndLocation, ECC_Visibility);
-	DrawDebugLine(World, WorldLocation, LineTraceEndLocation, FColor::Yellow);
 
 	if (Hit.Distance <= HoverHeight)
 	{

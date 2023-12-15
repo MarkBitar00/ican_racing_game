@@ -50,7 +50,6 @@ void UCPP_HoverComponent::Hover()
 	UWorld* World = GetWorld();
 
 	bool bHit = World->LineTraceSingleByChannel(Hit, WorldLocation, LineTraceEndLocation, ECC_Visibility);
-	DrawDebugLine(World, WorldLocation, LineTraceEndLocation, FColor::Red);
 
 	if (Hit.Distance <= HoverHeight)
 	{
