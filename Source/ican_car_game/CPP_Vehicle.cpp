@@ -333,6 +333,8 @@ void ACPP_Vehicle::SetMagnetInRange(ACPP_Magnet* Magnet)
 // Accelerate Input Action handlers
 void ACPP_Vehicle::Accelerate(const struct FInputActionInstance& Instance)
 {
+	if (!bIsInputActive) return;
+
 	const float AccelerationValue = CurveAcceleration->GetFloatValue(Instance.GetElapsedTime()) * Instance.GetValue().Get<float>();
 	FVector ForwardVector = Mesh->GetForwardVector();
 
@@ -346,11 +348,15 @@ void ACPP_Vehicle::HandleAccelerate_Implementation(float Acceleration, FVector F
 
 void ACPP_Vehicle::StartAccelerate()
 {
+	if (!bIsInputActive) return;
+
 	CameraCurrentZoom = MaxCameraZoom;
 }
 
 void ACPP_Vehicle::StopAccelerate(const struct FInputActionInstance& Instance)
 {
+	if (!bIsInputActive) return;
+
 	const float AccelerationDuration = Instance.GetTriggeredTime();
 	float DecelerationTimelinePlayRate = 1 / FMath::Clamp(AccelerationDuration, 0, MaxDecelerationDuration);
 
@@ -362,6 +368,8 @@ void ACPP_Vehicle::StopAccelerate(const struct FInputActionInstance& Instance)
 // Brake Input Action handlers
 void ACPP_Vehicle::StartBrake()
 {
+	if (!bIsInputActive) return;
+
 	AccelerationSpeed = 0;
 	CameraCurrentZoom = CameraInitialZoom;
 	CameraCurrentOffset = 0;
@@ -377,6 +385,8 @@ void ACPP_Vehicle::StopBrake()
 // Steer Input Action handlers
 void ACPP_Vehicle::Steer(const struct FInputActionValue& Value)
 {
+	if (!bIsInputActive) return;
+
 	const float SteerValue = Value.Get<float>();
 
 	if (SteerValue < 0.1 && SteerValue > -0.1)
@@ -410,7 +420,7 @@ void ACPP_Vehicle::StopSteer()
 // Toggle Polarity Input Action handler
 void ACPP_Vehicle::TogglePolarity()
 {
-	if (!bCanSwitchPolarity) return;
+	if (!bCanSwitchPolarity || !bIsInputActive) return;
 
 	EMagneticPolarity NewPolarity = MagneticPolarity == EMagneticPolarity::POSITIVE ? EMagneticPolarity::NEGATIVE : EMagneticPolarity::POSITIVE;
 	UMaterialInterface* MatPos = MaterialPositive != nullptr ? MaterialPositive : MaterialPositiveFallback;

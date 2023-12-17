@@ -230,6 +230,10 @@ protected:
 	UPROPERTY(BlueprintReadonly, Category = "Magnetism")
 	ACPP_Magnet* MagnetInRange = nullptr;
 
+	// Attributes (Input)
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsInputActive = true;
+
 	// Timer components
 	FTimerHandle PolarityTimerHandle;
 	FTimerHandle BoostTimerHandle;
