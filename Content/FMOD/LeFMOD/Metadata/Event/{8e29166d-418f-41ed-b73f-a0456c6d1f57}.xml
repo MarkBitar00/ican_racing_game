@@ -106,6 +106,9 @@
 		</relationship>
 	</object>
 	<object class="EventMixerGroup" id="{6674d370-fb0e-4697-9e4a-b28a05a3aed4}">
+		<property name="volume">
+			<value>-4</value>
+		</property>
 		<property name="name">
 			<value>Audio 1</value>
 		</property>
@@ -147,7 +150,9 @@
 			<destination>{07df0a04-e25f-4b26-b267-1a140f56c8ed}</destination>
 			<destination>{d467094b-89b2-4a48-b76b-505ae57ef970}</destination>
 			<destination>{6f1bbab3-da5a-4a78-bc59-a88dd4f90db2}</destination>
+			<destination>{e63a85f8-9736-44e7-9836-2967517d1548}</destination>
 			<destination>{9fea561b-0dee-4688-8e61-e0b8bf9e6f0b}</destination>
+			<destination>{661616a3-d2e6-45f5-af16-34f9015333fe}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{1e17008c-b604-4c37-961a-205e9e2744dd}" />
@@ -204,6 +209,23 @@
 		</relationship>
 	</object>
 	<object class="DistortionEffect" id="{6f1bbab3-da5a-4a78-bc59-a88dd4f90db2}" />
+	<object class="CompressorEffect" id="{e63a85f8-9736-44e7-9836-2967517d1548}">
+		<property name="threshold">
+			<value>-12</value>
+		</property>
+		<property name="ratio">
+			<value>3.60000014</value>
+		</property>
+		<property name="attackTime">
+			<value>1</value>
+		</property>
+		<property name="releaseTime">
+			<value>42</value>
+		</property>
+		<property name="gain">
+			<value>5</value>
+		</property>
+	</object>
 	<object class="MultibandEqEffect" id="{9fea561b-0dee-4688-8e61-e0b8bf9e6f0b}">
 		<property name="filterTypeA">
 			<value>7</value>
@@ -252,6 +274,32 @@
 		</property>
 		<property name="gainE">
 			<value>-5</value>
+		</property>
+	</object>
+	<object class="MultibandEqEffect" id="{661616a3-d2e6-45f5-af16-34f9015333fe}">
+		<property name="filterTypeA">
+			<value>8</value>
+		</property>
+		<property name="filterTypeB">
+			<value>9</value>
+		</property>
+		<property name="frequencyA">
+			<value>1013.64459</value>
+		</property>
+		<property name="frequencyB">
+			<value>258.228607</value>
+		</property>
+		<property name="qualityA">
+			<value>0.581413805</value>
+		</property>
+		<property name="qualityB">
+			<value>1.30000007</value>
+		</property>
+		<property name="gainA">
+			<value>-12.931036</value>
+		</property>
+		<property name="gainB">
+			<value>-12.931036</value>
 		</property>
 	</object>
 	<object class="LFOModulator" id="{a607978d-aa1f-4ab7-b69d-77aced5c08cc}">

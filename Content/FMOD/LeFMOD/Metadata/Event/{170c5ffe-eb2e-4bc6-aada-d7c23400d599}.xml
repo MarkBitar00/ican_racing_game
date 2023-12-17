@@ -201,14 +201,32 @@
 		<property name="filterTypeA">
 			<value>8</value>
 		</property>
+		<property name="filterTypeB">
+			<value>11</value>
+		</property>
 		<property name="frequencyA">
 			<value>371.344147</value>
+		</property>
+		<property name="frequencyB">
+			<value>7500</value>
+		</property>
+		<property name="frequencyC">
+			<value>12063.5361</value>
 		</property>
 		<property name="qualityA">
 			<value>0.840758622</value>
 		</property>
+		<property name="qualityB">
+			<value>1.95000005</value>
+		</property>
+		<property name="qualityC">
+			<value>1.80000007</value>
+		</property>
 		<property name="gainA">
 			<value>-10.3448277</value>
+		</property>
+		<property name="gainC">
+			<value>-18</value>
 		</property>
 		<relationship name="automators">
 			<destination>{67cf132a-0972-43d0-8e5a-b51ecbd04255}</destination>
