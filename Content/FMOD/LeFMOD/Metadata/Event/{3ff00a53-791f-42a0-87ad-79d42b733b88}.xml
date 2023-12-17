@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.02.00">
 	<object class="Event" id="{3ff00a53-791f-42a0-87ad-79d42b733b88}">
+		<property name="color">
+			<value>Green</value>
+		</property>
 		<property name="name">
 			<value>LMAG_Repulsion</value>
 		</property>
@@ -59,11 +62,17 @@
 	<object class="EventAutomatableProperties" id="{715ea9d7-1b99-4c59-91c3-c4cb6da9181c}" />
 	<object class="MarkerTrack" id="{9fb89691-8cbf-42bb-995a-725870fed02a}" />
 	<object class="GroupTrack" id="{88629144-4f4e-4d22-ac42-0245a24cdb00}">
+		<relationship name="modules">
+			<destination>{f93fd224-c782-468c-be9e-6d749f7c478f}</destination>
+		</relationship>
 		<relationship name="mixerGroup">
 			<destination>{50dddf36-a33f-4f75-94b2-0faee7a40fbf}</destination>
 		</relationship>
 	</object>
 	<object class="Timeline" id="{27a93ae3-3fc0-4f04-a628-2ae3e955d8c4}">
+		<relationship name="modules">
+			<destination>{f93fd224-c782-468c-be9e-6d749f7c478f}</destination>
+		</relationship>
 		<relationship name="markers">
 			<destination>{28f7ef7e-e9af-49ae-9425-0e6894e7bb7e}</destination>
 		</relationship>
@@ -85,6 +94,20 @@
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{71cca04d-ed47-47f9-86c9-74b2d462c642}" />
+	<object class="SingleSound" id="{f93fd224-c782-468c-be9e-6d749f7c478f}">
+		<property name="isAsync">
+			<value>true</value>
+		</property>
+		<property name="length">
+			<value>2.6666666666666665</value>
+		</property>
+		<property name="looping">
+			<value>true</value>
+		</property>
+		<relationship name="audioFile">
+			<destination>{c89b51f4-1cde-47e6-a52e-8c9626399054}</destination>
+		</relationship>
+	</object>
 	<object class="EventMixerGroup" id="{50dddf36-a33f-4f75-94b2-0faee7a40fbf}">
 		<property name="name">
 			<value>Audio 1</value>
@@ -101,10 +124,10 @@
 	</object>
 	<object class="LoopRegion" id="{28f7ef7e-e9af-49ae-9425-0e6894e7bb7e}">
 		<property name="position">
-			<value>0.5</value>
+			<value>0</value>
 		</property>
 		<property name="length">
-			<value>6</value>
+			<value>2.6666666666666665</value>
 		</property>
 		<relationship name="timeline">
 			<destination>{27a93ae3-3fc0-4f04-a628-2ae3e955d8c4}</destination>
@@ -123,11 +146,26 @@
 	<object class="MixerBusFader" id="{a43a1f31-3c11-41df-a654-f84db49c97d6}" />
 	<object class="MixerBusEffectChain" id="{ae81a9a2-7c97-4d90-b33e-0cae23f6f4d3}">
 		<relationship name="effects">
+			<destination>{11aadc13-972b-4d2e-b853-85265f9d76a9}</destination>
 			<destination>{0799c657-4f96-4aed-8bfb-f5efc7300d18}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{faa39c80-a0cb-40ba-8835-1d47a32296d6}" />
 	<object class="MixerBusFader" id="{f429bb7f-d2f7-4fc3-b2f9-2a59b383fb4e}" />
 	<object class="SpatialiserEffect" id="{25f6e38a-2532-4382-a029-a02e99deb65f}" />
+	<object class="MultibandEqEffect" id="{11aadc13-972b-4d2e-b853-85265f9d76a9}">
+		<property name="bypass">
+			<value>true</value>
+		</property>
+		<property name="filterTypeA">
+			<value>8</value>
+		</property>
+		<property name="frequencyA">
+			<value>420.499817</value>
+		</property>
+		<property name="gainA">
+			<value>7.24137783</value>
+		</property>
+	</object>
 	<object class="MixerBusFader" id="{0799c657-4f96-4aed-8bfb-f5efc7300d18}" />
 </objects>

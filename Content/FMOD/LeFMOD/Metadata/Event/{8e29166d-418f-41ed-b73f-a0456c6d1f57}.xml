@@ -78,6 +78,9 @@
 		</relationship>
 	</object>
 	<object class="EventMixerMaster" id="{724fecff-5fdc-4dfa-bb57-e2dfe593a91f}">
+		<property name="volume">
+			<value>6</value>
+		</property>
 		<relationship name="effectChain">
 			<destination>{f08f76fc-b44a-4131-8793-aab040b53729}</destination>
 		</relationship>
@@ -144,6 +147,7 @@
 			<destination>{07df0a04-e25f-4b26-b267-1a140f56c8ed}</destination>
 			<destination>{d467094b-89b2-4a48-b76b-505ae57ef970}</destination>
 			<destination>{6f1bbab3-da5a-4a78-bc59-a88dd4f90db2}</destination>
+			<destination>{9fea561b-0dee-4688-8e61-e0b8bf9e6f0b}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{1e17008c-b604-4c37-961a-205e9e2744dd}" />
@@ -200,6 +204,56 @@
 		</relationship>
 	</object>
 	<object class="DistortionEffect" id="{6f1bbab3-da5a-4a78-bc59-a88dd4f90db2}" />
+	<object class="MultibandEqEffect" id="{9fea561b-0dee-4688-8e61-e0b8bf9e6f0b}">
+		<property name="filterTypeA">
+			<value>7</value>
+		</property>
+		<property name="filterTypeB">
+			<value>9</value>
+		</property>
+		<property name="filterTypeC">
+			<value>3</value>
+		</property>
+		<property name="filterTypeD">
+			<value>7</value>
+		</property>
+		<property name="filterTypeE">
+			<value>9</value>
+		</property>
+		<property name="frequencyA">
+			<value>80</value>
+		</property>
+		<property name="frequencyB">
+			<value>190</value>
+		</property>
+		<property name="frequencyC">
+			<value>6000</value>
+		</property>
+		<property name="frequencyD">
+			<value>460</value>
+		</property>
+		<property name="frequencyE">
+			<value>3200</value>
+		</property>
+		<property name="qualityC">
+			<value>0.419999987</value>
+		</property>
+		<property name="qualityE">
+			<value>3.10000014</value>
+		</property>
+		<property name="gainA">
+			<value>-12.5</value>
+		</property>
+		<property name="gainB">
+			<value>-7.5</value>
+		</property>
+		<property name="gainD">
+			<value>-3</value>
+		</property>
+		<property name="gainE">
+			<value>-5</value>
+		</property>
+	</object>
 	<object class="LFOModulator" id="{a607978d-aa1f-4ab7-b69d-77aced5c08cc}">
 		<property name="nameOfPropertyBeingModulated">
 			<value>frequency</value>

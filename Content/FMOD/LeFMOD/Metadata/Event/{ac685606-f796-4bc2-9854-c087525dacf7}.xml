@@ -152,6 +152,7 @@
 			<destination>{febc0fd5-3a7d-4930-8762-abe662cfc6d7}</destination>
 			<destination>{42037b41-12d9-4c3f-9966-3623b1fb61d0}</destination>
 			<destination>{fc2301e9-8880-4144-ae93-0e6c7d6d4edb}</destination>
+			<destination>{84009c44-e40e-4735-9b7c-a122357261be}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{806ded04-110f-4bc0-960a-557a742d7573}" />
@@ -170,4 +171,15 @@
 	</object>
 	<object class="PitchShifterEffect" id="{42037b41-12d9-4c3f-9966-3623b1fb61d0}" />
 	<object class="PitchShifterEffect" id="{fc2301e9-8880-4144-ae93-0e6c7d6d4edb}" />
+	<object class="MultibandEqEffect" id="{84009c44-e40e-4735-9b7c-a122357261be}">
+		<property name="filterTypeA">
+			<value>7</value>
+		</property>
+		<property name="frequencyA">
+			<value>159.521286</value>
+		</property>
+		<property name="gainA">
+			<value>-14.4827595</value>
+		</property>
+	</object>
 </objects>

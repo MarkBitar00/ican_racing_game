@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{e7c6f46c-2227-43cf-b77e-bbb2f8736b57}">
+		<property name="assetPath">
+			<value>engineloop-004.ogg</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>6.9656009070294784</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{fa1c4fc0-5bc0-4e81-b87f-cef6240ab011}</destination>
+		</relationship>
+	</object>
+</objects>

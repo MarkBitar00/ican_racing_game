@@ -2,10 +2,10 @@
 <objects serializationModel="Studio.02.02.00">
 	<object class="Event" id="{b7dac21d-5a37-4eaf-b570-ecdecc98503e}">
 		<property name="color">
-			<value>Yellow</value>
+			<value>Purple</value>
 		</property>
 		<property name="name">
-			<value>ENG_Acceleration</value>
+			<value>ENG_AccelerationDeadge</value>
 		</property>
 		<property name="outputFormat">
 			<value>2</value>
