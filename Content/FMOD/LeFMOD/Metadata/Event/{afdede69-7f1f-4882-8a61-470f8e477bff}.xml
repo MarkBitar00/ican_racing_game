@@ -271,16 +271,16 @@
 			<value>8</value>
 		</property>
 		<property name="frequencyA">
-			<value>1184.88428</value>
+			<value>1793.24646</value>
 		</property>
 		<property name="frequencyC">
-			<value>11104.0605</value>
+			<value>6753.43848</value>
 		</property>
 		<property name="qualityA">
-			<value>0.602344871</value>
+			<value>0.686068952</value>
 		</property>
 		<property name="gainC">
-			<value>-20.6896553</value>
+			<value>-17.5862064</value>
 		</property>
 	</object>
 	<object class="MixerBusFader" id="{1f214399-b083-45de-9c6e-8bc8cc9db2ea}" />
