@@ -42,6 +42,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void StopDeceleration();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void EventOnPolarityToggle();
+
 	// Functions
 	UFUNCTION(BlueprintCallable)
 	void TimelineDecelerationUpdate(float Alpha);
