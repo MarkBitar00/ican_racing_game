@@ -29,7 +29,6 @@ ACPP_Vehicle::ACPP_Vehicle()
 	CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionSphere"));
 	CollisionSphere->SetupAttachment(Mesh);
 	CollisionSphere->InitSphereRadius(ColliderRadius);
-	CollisionSphere->SetHiddenInGame(false);
 
 	// Create Spring Arm and attach it to Root Component
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));

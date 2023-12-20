@@ -321,7 +321,7 @@ public:
 	bool bActivateVehicleMagnetism = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
-	float ColliderRadius = 800;
+	float ColliderRadius = 500;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Magnetism")
 	float VehicleMagneticPower = 500;
