@@ -59,7 +59,14 @@
 			<destination>{52448e16-9cb2-40e9-af87-38380515b22e}</destination>
 		</relationship>
 	</object>
-	<object class="EventAutomatableProperties" id="{e6712ef0-6739-4179-bc04-ae5bafdb4da5}" />
+	<object class="EventAutomatableProperties" id="{e6712ef0-6739-4179-bc04-ae5bafdb4da5}">
+		<property name="minimumDistance">
+			<value>4</value>
+		</property>
+		<property name="maximumDistance">
+			<value>60.5</value>
+		</property>
+	</object>
 	<object class="MarkerTrack" id="{752216a6-1146-4234-b5e5-d5102edec5ea}" />
 	<object class="GroupTrack" id="{14b61762-10a9-46a7-ae1e-6c20a8ef35cb}">
 		<relationship name="modules">
@@ -139,6 +146,7 @@
 	<object class="MixerBusEffectChain" id="{f08f76fc-b44a-4131-8793-aab040b53729}">
 		<relationship name="effects">
 			<destination>{2080d28b-d1d4-4b94-8468-6914c37d15be}</destination>
+			<destination>{f9fc51ae-0a5b-49ae-bbcb-771421f1986d}</destination>
 			<destination>{4c313072-f132-46c9-91cf-8fdd4b27c19a}</destination>
 		</relationship>
 	</object>
@@ -157,6 +165,11 @@
 	</object>
 	<object class="MixerBusPanner" id="{1e17008c-b604-4c37-961a-205e9e2744dd}" />
 	<object class="MixerBusFader" id="{2080d28b-d1d4-4b94-8468-6914c37d15be}" />
+	<object class="GainEffect" id="{f9fc51ae-0a5b-49ae-bbcb-771421f1986d}">
+		<property name="gain">
+			<value>8</value>
+		</property>
+	</object>
 	<object class="SpatialiserEffect" id="{4c313072-f132-46c9-91cf-8fdd4b27c19a}" />
 	<object class="MultibandEqEffect" id="{76bf48c1-14d0-4b89-9e16-d1b388a39203}">
 		<property name="filterTypeA">

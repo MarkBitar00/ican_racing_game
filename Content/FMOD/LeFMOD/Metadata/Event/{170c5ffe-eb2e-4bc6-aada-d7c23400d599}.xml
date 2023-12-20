@@ -62,7 +62,14 @@
 			<destination>{52448e16-9cb2-40e9-af87-38380515b22e}</destination>
 		</relationship>
 	</object>
-	<object class="EventAutomatableProperties" id="{1b3a406c-4287-4418-be31-fb9c0a01b22c}" />
+	<object class="EventAutomatableProperties" id="{1b3a406c-4287-4418-be31-fb9c0a01b22c}">
+		<property name="minimumDistance">
+			<value>3.60000014</value>
+		</property>
+		<property name="maximumDistance">
+			<value>55</value>
+		</property>
+	</object>
 	<object class="MarkerTrack" id="{73a46f2d-83c2-4da8-8a48-398a84b954e3}" />
 	<object class="GroupTrack" id="{b7c21e5e-6ee1-4389-bfc4-c2e861b42fc1}">
 		<relationship name="automationTracks">
@@ -256,7 +263,7 @@
 			<value>-16</value>
 		</property>
 		<property name="curveShape">
-			<value>-0.28044647</value>
+			<value>0.0653194338</value>
 		</property>
 	</object>
 	<object class="Automator" id="{67cf132a-0972-43d0-8e5a-b51ecbd04255}">

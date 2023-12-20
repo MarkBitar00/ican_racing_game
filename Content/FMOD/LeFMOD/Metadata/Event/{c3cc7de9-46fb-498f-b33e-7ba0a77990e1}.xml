@@ -105,6 +105,15 @@
 		<property name="length">
 			<value>2</value>
 		</property>
+		<property name="volume">
+			<value>-1</value>
+		</property>
+		<property name="playlistMode">
+			<value>1</value>
+		</property>
+		<relationship name="modulators">
+			<destination>{f680d1ce-a279-455b-aa13-52d466c2c5dd}</destination>
+		</relationship>
 		<relationship name="sounds">
 			<destination>{c0254065-0b3a-4c41-b5fb-142b6391da25}</destination>
 			<destination>{b8d0a550-2e9c-4b78-ba9e-07eba55f9f16}</destination>
@@ -128,6 +137,15 @@
 		<property name="length">
 			<value>2</value>
 		</property>
+		<property name="volume">
+			<value>-1</value>
+		</property>
+		<property name="playlistMode">
+			<value>1</value>
+		</property>
+		<relationship name="modulators">
+			<destination>{a15af8c5-6deb-4f75-8e41-efd013ec979f}</destination>
+		</relationship>
 		<relationship name="sounds">
 			<destination>{80740b21-c37a-4526-a796-e68af689b96c}</destination>
 			<destination>{27184abc-b96b-495d-b764-cd32c1f96047}</destination>
@@ -159,6 +177,14 @@
 	</object>
 	<object class="MixerBusPanner" id="{6cdee3b6-d0b4-4640-bf39-4a274168503d}" />
 	<object class="MixerBusFader" id="{8a43438b-40dc-4799-864e-d609695a5e51}" />
+	<object class="RandomizerModulator" id="{f680d1ce-a279-455b-aa13-52d466c2c5dd}">
+		<property name="nameOfPropertyBeingModulated">
+			<value>volume</value>
+		</property>
+		<property name="amount">
+			<value>1</value>
+		</property>
+	</object>
 	<object class="SingleSound" id="{c0254065-0b3a-4c41-b5fb-142b6391da25}">
 		<relationship name="modulators">
 			<destination>{252ae2fe-d24c-4fa7-bcd3-242d57d4125c}</destination>
@@ -182,6 +208,14 @@
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{b9b8b620-f733-4db7-b888-d24c48664d28}" />
+	<object class="RandomizerModulator" id="{a15af8c5-6deb-4f75-8e41-efd013ec979f}">
+		<property name="nameOfPropertyBeingModulated">
+			<value>volume</value>
+		</property>
+		<property name="amount">
+			<value>1</value>
+		</property>
+	</object>
 	<object class="SingleSound" id="{80740b21-c37a-4526-a796-e68af689b96c}">
 		<relationship name="modulators">
 			<destination>{fe76ae04-a442-4df4-9eb4-9edb99821c73}</destination>
