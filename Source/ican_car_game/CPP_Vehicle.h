@@ -43,7 +43,7 @@ public:
 	void StopDeceleration();
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void EventOnPolarityToggle();
+	void OnPolarityToggle();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnBoost();
