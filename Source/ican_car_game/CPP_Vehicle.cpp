@@ -428,7 +428,7 @@ void ACPP_Vehicle::TogglePolarity()
 	UMaterialInterface* NewMaterial = NewPolarity == EMagneticPolarity::POSITIVE ? MatPos : MatNeg;
 
 	HandleTogglePolarity(NewPolarity, NewMaterial);
-	EventOnPolarityToggle();
+	OnPolarityToggle();
 
 	bCanSwitchPolarity = false;
 	GetWorld()->GetTimerManager().SetTimer(PolarityTimerHandle, this, &ACPP_Vehicle::OnPolarityTimerEnd, 1, false, PolarityDelay);
