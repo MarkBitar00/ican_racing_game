@@ -48,6 +48,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnBoost();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnBoostEnd();
+
 	// Functions
 	UFUNCTION(BlueprintCallable)
 	void TimelineDecelerationUpdate(float Alpha);

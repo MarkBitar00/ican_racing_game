@@ -488,4 +488,6 @@ void ACPP_Vehicle::OnBoostTimerEnd()
 	CameraCurrentZoom = MaxCameraZoom;
 	CameraCurrentFieldOfView = CameraInitialFieldOfView;
 	CameraCurrentBlur = CameraInitialBlur;
+
+	OnBoostEnd();
 }
