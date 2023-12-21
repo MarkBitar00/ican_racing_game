@@ -41,6 +41,7 @@ ACPP_Vehicle::ACPP_Vehicle()
 	// Create Camera and attach it to Spring Arm
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
+	Camera->PostProcessBlendWeight = FMath::Clamp(CameraPostProcessBlend, 0, 1);
 
 	// Create and setup Hover Components
 	HoverFrontLeft = CreateDefaultSubobject<UCPP_HoverComponent>(TEXT("HoverFrontLeft"));
@@ -114,15 +115,15 @@ void ACPP_Vehicle::BeginPlay()
 	InitialAccelerationSpeed = AccelerationSpeed;
 	CameraCurrentZoom = CameraInitialZoom;
 	CameraCurrentFieldOfView = CameraInitialFieldOfView;
-	//CameraCurrentBlur = CameraInitialBlur;
+	CameraCurrentBlur = CameraInitialBlur;
 	CameraCurrentOffset = 0;
 
 	// Setup Camera properties
 	SpringArm->SocketOffset = FVector(0, 0, SpringArmTargetOffset);
 	Camera->SetRelativeRotation(FRotator(CameraRotation, 0, 0));
 	Camera->SetFieldOfView(CameraInitialFieldOfView);
-	//Camera->PostProcessSettings.bOverride_SceneFringeIntensity = true;
-	//Camera->PostProcessSettings.SceneFringeIntensity = CameraInitialBlur;
+	Camera->PostProcessSettings.bOverride_SceneFringeIntensity = true;
+	Camera->PostProcessSettings.SceneFringeIntensity = CameraInitialBlur;
 
 	// Setup Mesh properties
 	UMaterialInterface* MatPos = MaterialPositive != nullptr ? MaterialPositive : MaterialPositiveFallback;
@@ -154,7 +155,7 @@ void ACPP_Vehicle::Tick(float DeltaTime)
 	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, CameraCurrentZoom, DeltaTime, CameraInterpolationSpeed);
 	SpringArm->SocketOffset.Y = FMath::FInterpTo(SpringArm->SocketOffset.Y, CameraCurrentOffset, DeltaTime, CameraInterpolationSpeed);
 	Camera->FieldOfView = FMath::FInterpTo(Camera->FieldOfView, CameraCurrentFieldOfView, DeltaTime, CameraInterpolationSpeed);
-	//Camera->PostProcessSettings.SceneFringeIntensity = FMath::FInterpTo(Camera->PostProcessSettings.SceneFringeIntensity, CameraCurrentBlur, DeltaTime, CameraInterpolationSpeed);
+	Camera->PostProcessSettings.SceneFringeIntensity = FMath::FInterpTo(Camera->PostProcessSettings.SceneFringeIntensity, CameraCurrentBlur, DeltaTime, CameraInterpolationSpeed);
 
 	// Smooth out Center Of Mass Location
 	UpdateCenterOfMass();
@@ -439,16 +440,16 @@ void ACPP_Vehicle::TogglePolarity()
 		float BoostMultiplier = CurveBoostMultiplier->GetFloatValue(BoostDistance);
 		float BoostDuration = CurveBoostDuration->GetFloatValue(BoostDistance);
 		float FieldOfViewMultiplier = CurveFieldOfView->GetFloatValue(BoostDistance);
-		//float AddedBlur = CurveBlur->GetFloatValue(BoostDistance);
+		float AddedBlur = CurveBlur->GetFloatValue(BoostDistance);
 		float NewAccelerationSpeed = AccelerationSpeed * BoostMultiplier;
 		float NewCameraZoom = CameraCurrentZoom * BoostMultiplier;
 		float NewFieldOfView = CameraCurrentFieldOfView * FieldOfViewMultiplier;
-		//float NewBlur = CameraCurrentBlur + AddedBlur;
+		float NewBlur = CameraCurrentBlur + AddedBlur;
 
 		AccelerationSpeed = NewAccelerationSpeed > MaxBoostAccelerationSpeed ? MaxBoostAccelerationSpeed : NewAccelerationSpeed;
 		CameraCurrentZoom = NewCameraZoom > MaxBoostCameraZoom ? MaxBoostCameraZoom : NewCameraZoom;
 		CameraCurrentFieldOfView = NewFieldOfView > MaxCameraFieldOfView ? MaxCameraFieldOfView : NewFieldOfView;
-		//CameraCurrentBlur = NewBlur > MaxCameraBlur ? MaxCameraBlur : NewBlur;
+		CameraCurrentBlur = NewBlur > MaxCameraBlur ? MaxCameraBlur : NewBlur;
 
 		GetWorld()->GetTimerManager().SetTimer(BoostTimerHandle, this, &ACPP_Vehicle::OnBoostTimerEnd, 1, false, BoostDuration);
 	}
@@ -485,5 +486,5 @@ void ACPP_Vehicle::OnBoostTimerEnd()
 	AccelerationSpeed = InitialAccelerationSpeed;
 	CameraCurrentZoom = MaxCameraZoom;
 	CameraCurrentFieldOfView = CameraInitialFieldOfView;
-	//CameraCurrentBlur = CameraInitialBlur;
+	CameraCurrentBlur = CameraInitialBlur;
 }
