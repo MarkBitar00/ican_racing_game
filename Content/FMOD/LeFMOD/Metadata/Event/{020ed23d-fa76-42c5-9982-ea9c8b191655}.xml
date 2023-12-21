@@ -122,6 +122,9 @@
 		</relationship>
 	</object>
 	<object class="EventMixerMaster" id="{bb84a2bc-beb2-47f8-a5bb-611572d01964}">
+		<property name="volume">
+			<value>10</value>
+		</property>
 		<relationship name="effectChain">
 			<destination>{97e9c8b9-eea9-49cc-83cc-be7593c54812}</destination>
 		</relationship>
@@ -256,7 +259,7 @@
 			<value>0.54000000000000004</value>
 		</property>
 		<property name="length">
-			<value>0.45999999999999952</value>
+			<value>0.46500000000000008</value>
 		</property>
 		<property name="looping">
 			<value>true</value>
@@ -293,6 +296,7 @@
 			<destination>{a374e1c0-8a24-4a0c-a898-741cb1943ed3}</destination>
 			<destination>{2c1b8a84-094f-42da-bcf2-4ecdea6f4212}</destination>
 			<destination>{c6b38358-d2b7-4859-a0ea-4afdfde6a56e}</destination>
+			<destination>{d45beed1-d3ad-4a56-ae4f-295a271081f0}</destination>
 			<destination>{23adfc79-1933-4cd6-900a-71eb6dbb40ed}</destination>
 		</relationship>
 	</object>
@@ -392,7 +396,7 @@
 			<value>4000</value>
 		</property>
 		<property name="frequencyB">
-			<value>96.5813828</value>
+			<value>100</value>
 		</property>
 		<property name="qualityA">
 			<value>0.885344803</value>
@@ -434,6 +438,11 @@
 		</relationship>
 	</object>
 	<object class="MixerBusFader" id="{c6b38358-d2b7-4859-a0ea-4afdfde6a56e}" />
+	<object class="GainEffect" id="{d45beed1-d3ad-4a56-ae4f-295a271081f0}">
+		<property name="gain">
+			<value>2</value>
+		</property>
+	</object>
 	<object class="SpatialiserEffect" id="{23adfc79-1933-4cd6-900a-71eb6dbb40ed}" />
 	<object class="AutomationPoint" id="{f1e24015-e23b-42eb-b512-cf910a3437e4}">
 		<property name="position">
