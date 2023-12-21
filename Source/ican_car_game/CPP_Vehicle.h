@@ -278,6 +278,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
 	float MaxCameraBlur = 3;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Camera")
+	float CameraPostProcessBlend = 0.5;
+
 	// Public attributes (Movement)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes | Movement")
 	float AccelerationSpeed = 12000;
