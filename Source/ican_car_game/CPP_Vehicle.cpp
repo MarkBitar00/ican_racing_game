@@ -451,6 +451,7 @@ void ACPP_Vehicle::TogglePolarity()
 		CameraCurrentFieldOfView = NewFieldOfView > MaxCameraFieldOfView ? MaxCameraFieldOfView : NewFieldOfView;
 		CameraCurrentBlur = NewBlur > MaxCameraBlur ? MaxCameraBlur : NewBlur;
 
+		OnBoost();
 		GetWorld()->GetTimerManager().SetTimer(BoostTimerHandle, this, &ACPP_Vehicle::OnBoostTimerEnd, 1, false, BoostDuration);
 	}
 	else

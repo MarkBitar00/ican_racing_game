@@ -45,6 +45,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void EventOnPolarityToggle();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnBoost();
+
 	// Functions
 	UFUNCTION(BlueprintCallable)
 	void TimelineDecelerationUpdate(float Alpha);
