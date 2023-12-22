@@ -113,9 +113,6 @@
 		</relationship>
 	</object>
 	<object class="EventMixerGroup" id="{6674d370-fb0e-4697-9e4a-b28a05a3aed4}">
-		<property name="volume">
-			<value>-4</value>
-		</property>
 		<property name="name">
 			<value>Audio 1</value>
 		</property>
@@ -147,6 +144,7 @@
 		<relationship name="effects">
 			<destination>{2080d28b-d1d4-4b94-8468-6914c37d15be}</destination>
 			<destination>{f9fc51ae-0a5b-49ae-bbcb-771421f1986d}</destination>
+			<destination>{e7e180dd-7ecc-499c-97a4-12bd62d2916e}</destination>
 			<destination>{4c313072-f132-46c9-91cf-8fdd4b27c19a}</destination>
 		</relationship>
 	</object>
@@ -168,6 +166,11 @@
 	<object class="GainEffect" id="{f9fc51ae-0a5b-49ae-bbcb-771421f1986d}">
 		<property name="gain">
 			<value>8</value>
+		</property>
+	</object>
+	<object class="GainEffect" id="{e7e180dd-7ecc-499c-97a4-12bd62d2916e}">
+		<property name="gain">
+			<value>9</value>
 		</property>
 	</object>
 	<object class="SpatialiserEffect" id="{4c313072-f132-46c9-91cf-8fdd4b27c19a}" />

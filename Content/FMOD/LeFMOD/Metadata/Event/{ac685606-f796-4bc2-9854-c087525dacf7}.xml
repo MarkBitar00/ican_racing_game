@@ -64,10 +64,10 @@
 			<value>true</value>
 		</property>
 		<property name="minimumDistance">
-			<value>5.4000001</value>
+			<value>6.25</value>
 		</property>
 		<property name="maximumDistance">
-			<value>40</value>
+			<value>55</value>
 		</property>
 	</object>
 	<object class="MarkerTrack" id="{295cd991-b09e-4ec0-9c18-95d8940466ba}" />
@@ -89,7 +89,7 @@
 	</object>
 	<object class="EventMixerMaster" id="{7588b7ed-7ee9-44c1-8e82-46779ddd983d}">
 		<property name="volume">
-			<value>10</value>
+			<value>8</value>
 		</property>
 		<relationship name="effectChain">
 			<destination>{32e5fb5a-2223-419c-847a-fb8b4ed6daf5}</destination>

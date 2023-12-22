@@ -438,11 +438,7 @@
 		</relationship>
 	</object>
 	<object class="MixerBusFader" id="{c6b38358-d2b7-4859-a0ea-4afdfde6a56e}" />
-	<object class="GainEffect" id="{d45beed1-d3ad-4a56-ae4f-295a271081f0}">
-		<property name="gain">
-			<value>2</value>
-		</property>
-	</object>
+	<object class="GainEffect" id="{d45beed1-d3ad-4a56-ae4f-295a271081f0}" />
 	<object class="SpatialiserEffect" id="{23adfc79-1933-4cd6-900a-71eb6dbb40ed}" />
 	<object class="AutomationPoint" id="{f1e24015-e23b-42eb-b512-cf910a3437e4}">
 		<property name="position">

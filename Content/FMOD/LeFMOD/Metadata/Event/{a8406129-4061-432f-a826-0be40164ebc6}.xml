@@ -34,9 +34,6 @@
 			<destination>{3bf55ad1-295e-486b-ac12-07cc5da0c67c}</destination>
 			<destination>{68e625e9-e51d-46d7-bbb4-0348238084b8}</destination>
 		</relationship>
-		<relationship name="returnTracks">
-			<destination>{c216930a-53db-4b61-9a27-d328c4d0dc89}</destination>
-		</relationship>
 		<relationship name="timeline">
 			<destination>{33db6bc3-c708-4e3c-8434-6d80777b898d}</destination>
 		</relationship>
@@ -106,11 +103,6 @@
 		</relationship>
 		<relationship name="mixerGroup">
 			<destination>{aad6d7f9-e8f6-45f1-97e4-3f44ce6ed229}</destination>
-		</relationship>
-	</object>
-	<object class="ReturnTrack" id="{c216930a-53db-4b61-9a27-d328c4d0dc89}">
-		<relationship name="mixerReturn">
-			<destination>{537ccdcd-986b-44af-9206-167ec1cab04d}</destination>
 		</relationship>
 	</object>
 	<object class="Timeline" id="{33db6bc3-c708-4e3c-8434-6d80777b898d}">
@@ -279,20 +271,6 @@
 			<destination>{cf56a507-3224-4bc4-a8ad-3f90937cfe3e}</destination>
 		</relationship>
 	</object>
-	<object class="EventMixerReturn" id="{537ccdcd-986b-44af-9206-167ec1cab04d}">
-		<property name="name">
-			<value>A</value>
-		</property>
-		<relationship name="effectChain">
-			<destination>{a56364cd-7f31-4bf8-8866-a33328074f4b}</destination>
-		</relationship>
-		<relationship name="panner">
-			<destination>{9c18221e-3ac5-4888-b012-50819742f389}</destination>
-		</relationship>
-		<relationship name="output">
-			<destination>{cf56a507-3224-4bc4-a8ad-3f90937cfe3e}</destination>
-		</relationship>
-	</object>
 	<object class="MixerBusEffectChain" id="{d94d90b8-7810-4b6c-b8a8-cef9be326764}">
 		<relationship name="effects">
 			<destination>{00b2a49e-8f05-425f-8581-b737c03595f0}</destination>
@@ -386,12 +364,6 @@
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{621143b5-d5cb-475e-bb4a-2d4bdb5fcee7}" />
-	<object class="MixerBusEffectChain" id="{a56364cd-7f31-4bf8-8866-a33328074f4b}">
-		<relationship name="effects">
-			<destination>{f6a275c1-f48a-406d-9df4-ed9f3e530b37}</destination>
-		</relationship>
-	</object>
-	<object class="MixerBusPanner" id="{9c18221e-3ac5-4888-b012-50819742f389}" />
 	<object class="MixerBusFader" id="{00b2a49e-8f05-425f-8581-b737c03595f0}" />
 	<object class="SpatialiserEffect" id="{4226b6cf-4adf-443f-89c6-139ec5866bb2}" />
 	<object class="AutomationPoint" id="{c66ca161-09a3-427c-9f4a-43bbaa447537}">
@@ -513,7 +485,6 @@
 	</object>
 	<object class="Sidechain" id="{435c1b5c-d67d-44b5-83bf-a610dc03125c}" />
 	<object class="MixerBusFader" id="{97d73bab-d175-4ff4-82bb-435b71effd20}" />
-	<object class="MixerBusFader" id="{f6a275c1-f48a-406d-9df4-ed9f3e530b37}" />
 	<object class="Automator" id="{4f5ab0e4-2b89-4045-863c-320d09b588d5}">
 		<property name="nameOfPropertyBeingAutomated">
 			<value>gain</value>
