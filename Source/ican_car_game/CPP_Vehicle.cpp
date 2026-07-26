@@ -101,15 +101,9 @@ void ACPP_Vehicle::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 void ACPP_Vehicle::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-		}
-	}
+	// Debug controller by vehicle
+	UE_LOG(LogTemp, Warning, TEXT("Vehicle BeginPlay - Controller: %s"),
+		*GetNameSafe(Controller));
 
 	// Set initial attribute values
 	InitialAccelerationSpeed = AccelerationSpeed;
@@ -144,6 +138,8 @@ void ACPP_Vehicle::BeginPlay()
 	// Bind Collider overlap functions
 	CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &ACPP_Vehicle::OverlapBegin);
 	CollisionSphere->OnComponentEndOverlap.AddDynamic(this, &ACPP_Vehicle::OverlapEnd);
+
+	
 }
 
 // Called every frame
@@ -184,6 +180,54 @@ void ACPP_Vehicle::Tick(float DeltaTime)
 
 		FVector Force = (VehicleInRangeLocation - Location) * (bIsSamePolarity ? VehicleMagneticPower : -VehicleMagneticPower) * CurveFloatValue;
 		VehicleInRangeMesh->AddForce(Force, NAME_None, true);
+	}
+}
+
+void ACPP_Vehicle::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// Add Input Mapping Context
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Vehicle %s PossessedBy -> %s"),
+		*GetName(),
+		*GetNameSafe(NewController));
+}
+
+// Setup Enhanced Input when the Pawn is ready for local player input
+void ACPP_Vehicle::PawnClientRestart()
+{
+	Super::PawnClientRestart();
+
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+
+	UE_LOG(LogTemp, Warning, TEXT(
+		"PawnClientRestart %s - Controller: %s - LocalPlayer: %s"),
+		*GetName(),
+		*GetNameSafe(PlayerController),
+		PlayerController ? *GetNameSafe(PlayerController->GetLocalPlayer()) : TEXT("None")
+	);
+
+	if (!PlayerController)
+		return;
+
+	ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
+	if (!LocalPlayer)
+		return;
+
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
+		ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer))
+	{
+		Subsystem->AddMappingContext(DefaultMappingContext, 0);
+
+		UE_LOG(LogTemp, Warning, TEXT("Mapping Context ADDED for %s"), *GetName());
 	}
 }
 

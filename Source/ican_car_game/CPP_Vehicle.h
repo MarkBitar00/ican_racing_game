@@ -115,6 +115,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Called when this Pawn is possessed by a Controller
+	virtual void PossessedBy(AController* NewController) override;
+
+	// Setup Enhanced Input when the Pawn is ready for local player input
+	virtual void PawnClientRestart() override;
+
 	// Replicate properties
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
